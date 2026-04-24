@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Courtside · Wireframes</title>
+<style>html,body{margin:0;padding:0;background:#f0eee9;font-family:-apple-system,system-ui,sans-serif;}</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="wireframe-kit.jsx"></script>
+<script type="text/babel" src="wf-login.jsx"></script>
+<script type="text/babel" src="wf-dashboard.jsx"></script>
+<script type="text/babel" src="wf-archetype.jsx"></script>
+<script type="text/babel" src="wf-archetype-combined.jsx"></script>
+<script type="text/babel" src="wf-chat.jsx"></script>
+<script type="text/babel" src="wf-more.jsx"></script>
+<script type="text/babel" src="wf-flowmap.jsx"></script>
+
+<script type="text/babel" data-presets="react">
+const { useState } = React;
+
+// Header pinned to top of canvas explaining the doc
+function TitleCard() {
+  return (
+    <div style={{
+      position: 'absolute', top: 24, left: 24, zIndex: 5,
+      background: '#fbfaf6', border: `1.5px solid ${WK.ink}`, borderRadius: 10,
+      padding: '14px 18px', maxWidth: 420,
+      boxShadow: '3px 3px 0 rgba(27,26,23,.08)',
+    }}>
+      <div className="wk-hand" style={{ fontSize: 26, lineHeight: 1 }}>courtside · wireframes</div>
+      <div style={{ fontSize: 12, color: WK.ink70, marginTop: 6, lineHeight: 1.5 }}>
+        Player-side exploration from the v1.3 spec. Login, dashboard (3 directions),
+        archetype detail (3 directions), AI agent chat (2 directions). Each artboard
+        shown mobile + desktop. Pan/zoom the canvas; drag any card to reorder; click
+        ⤢ to focus.
+      </div>
+      <div className="wk-anno" style={{ marginTop: 8, fontSize: 13 }}>low-fi, orange accent, hand-labels = design notes</div>
+    </div>
+  );
+}
+
+function App() {
+  // Wrapper that paints paper bg so focus mode (which uses white frame bg) reads correctly
+  const Board = ({ children }) => (
+    <div style={{ width: '100%', height: '100%', background: '#f0eee9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      {children}
+    </div>
+  );
+  return (
+    <>
+      <TitleCard />
+      <DesignCanvas>
+        <DCSection id="flow" title="0. Navigation flow"
+          subtitle="How a player moves between screens. Start here.">
+          <DCArtboard id="flowmap" label="Flow map" width={1280} height={720}>
+            <FlowMap />
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection id="login" title="1. Login & onboarding"
+          subtitle="Email/password auth; first-run sets jersey # and position.">
+          <DCArtboard id="login-mobile" label="Mobile · Sign in" width={320} height={640}>
+            <Board><PhoneFrame width={320} height={640}><LoginMobileA /></PhoneFrame></Board>
+          </DCArtboard>
+          <DCArtboard id="onboard-jersey" label="Mobile · Pick jersey" width={320} height={640}>
+            <Board><PhoneFrame width={320} height={640}><OnboardRolePick /></PhoneFrame></Board>
+          </DCArtboard>
+          <DCArtboard id="onboard-pos" label="Mobile · Pick position" width={320} height={640}>
+            <Board><PhoneFrame width={320} height={640}><OnboardProfile /></PhoneFrame></Board>
+          </DCArtboard>
+          <DCArtboard id="login-desktop" label="Desktop · Sign in" width={900} height={560}>
+            <Board><DesktopFrame width={900} height={560}><LoginDesktop /></DesktopFrame></Board>
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection id="dashboard" title="2. Player dashboard · 3 directions · HERO"
+          subtitle="V1 safe card stack · V2 archetype-first hero · V3 newspaper/data-dense.">
+          <DCArtboard id="dash-v1-m" label="V1 · Mobile · Card stack" width={320} height={640}>
+            <Board><PhoneFrame width={320} height={640}><DashV1Mobile /></PhoneFrame></Board>
+          </DCArtboard>
+          <DCArtboard id="dash-v2-m" label="V2 · Mobile · Archetype hero" width={320} height={640}>
+            <Board><PhoneFrame width={320} height={640}><DashV2Mobile /></PhoneFrame></Board>
+          </DCArtboard>
+          <DCArtboard id="dash-v3-m" label="V3 · Mobile · Newspaper" width={320} height={640}>
+            <Board><PhoneFrame width={320} height={640}><DashV3Mobile /></PhoneFrame></Board>
+          </DCArtboard>
+          <DCArtboard id="dash-v1-d" label="V1 · Desktop · Card stack" width={900} height={560}>
+            <Board><DesktopFrame width={900} height={560}><DashV1Desktop /></DesktopFrame></Board>
+          </DCArtboard>
+          <DCArtboard id="dash-v2-d" label="V2 · Desktop · Archetype hero" width={900} height={560}>
+            <Board><DesktopFrame width={900} height={560}><DashV2Desktop /></DesktopFrame></Board>
+          </DCArtboard>
+          <DCArtboard id="dash-v3-d" label="V3 · Desktop · Newspaper" width={900} height={560}>
+            <Board><DesktopFrame width={900} height={560}><DashV3Desktop /></DesktopFrame></Board>
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection id="archetype" title="3. Archetype detail · combined + 3 directions"
+          subtitle="Combined shows A→B→C as one scrollable screen. The three singles below are the same pieces in isolation.">
+          <DCArtboard id="arch-combined" label="★ Combined · A+B+C" width={320} height={640}>
+            <Board><PhoneFrame width={320} height={640}><ArchetypeCombinedMobile /></PhoneFrame></Board>
+          </DCArtboard>
+          <DCArtboard id="arch-card" label="A · Trading card only" width={320} height={640}>
+            <Board><PhoneFrame width={320} height={640}><ArchetypeCardMobile /></PhoneFrame></Board>
+          </DCArtboard>
+          <DCArtboard id="arch-radar" label="B · Radar profile" width={320} height={640}>
+            <Board><PhoneFrame width={320} height={640}><ArchetypeRadarMobile /></PhoneFrame></Board>
+          </DCArtboard>
+          <DCArtboard id="arch-receipt" label="C · Receipt / breakdown" width={320} height={640}>
+            <Board><PhoneFrame width={320} height={640}><ArchetypeReceiptMobile /></PhoneFrame></Board>
+          </DCArtboard>
+          <DCArtboard id="arch-desktop" label="Desktop · Combined" width={900} height={560}>
+            <Board><DesktopFrame width={900} height={560}><ArchetypeDesktop /></DesktopFrame></Board>
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection id="more" title="5. Game log · Trends · Seasons · Notifications"
+          subtitle="Remaining player screens in the V2 direction.">
+          <DCArtboard id="gamelog-m" label="Game log · Mobile" width={320} height={640}>
+            <Board><PhoneFrame width={320} height={640}><GameLogMobile /></PhoneFrame></Board>
+          </DCArtboard>
+          <DCArtboard id="trends-m" label="Trends · Mobile" width={320} height={640}>
+            <Board><PhoneFrame width={320} height={640}><TrendsMobile /></PhoneFrame></Board>
+          </DCArtboard>
+          <DCArtboard id="seasons-m" label="Season switcher · Mobile" width={320} height={640}>
+            <Board><PhoneFrame width={320} height={640}><SeasonSwitcher /></PhoneFrame></Board>
+          </DCArtboard>
+          <DCArtboard id="notif-m" label="Notifications · Mobile" width={320} height={640}>
+            <Board><PhoneFrame width={320} height={640}><NotificationsMobile /></PhoneFrame></Board>
+          </DCArtboard>
+          <DCArtboard id="gamelog-d" label="Game log · Desktop" width={900} height={560}>
+            <Board><DesktopFrame width={900} height={560}><GameLogDesktop /></DesktopFrame></Board>
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection id="chat" title="4. AI agent chat · FAB entry · 2 directions"
+          subtitle="A · Full sheet modal conversation. B · Inline suggested-question launcher.">
+          <DCArtboard id="chat-sheet" label="A · Modal sheet chat" width={320} height={640}>
+            <Board><PhoneFrame width={320} height={640}><ChatSheetMobile /></PhoneFrame></Board>
+          </DCArtboard>
+          <DCArtboard id="chat-inline" label="B · Suggested Qs launcher" width={320} height={640}>
+            <Board><PhoneFrame width={320} height={640}><ChatInlineMobile /></PhoneFrame></Board>
+          </DCArtboard>
+          <DCArtboard id="chat-desktop" label="Desktop · Side panel" width={900} height={560}>
+            <Board><DesktopFrame width={900} height={560}><ChatDesktop /></DesktopFrame></Board>
+          </DCArtboard>
+        </DCSection>
+      </DesignCanvas>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
