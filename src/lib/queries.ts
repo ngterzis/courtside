@@ -52,6 +52,13 @@ export const useLastGame = (seasonId?: string) =>
     queryFn: () => delay(MOCK_GAMES[MOCK_GAMES.length - 1]),
   });
 
+export const useGame = (gameId?: string) =>
+  useQuery({
+    queryKey: ['game', gameId],
+    queryFn: () => delay(MOCK_GAMES.find((g) => g.id === gameId) ?? null),
+    enabled: !!gameId,
+  });
+
 export const useTeamRanks = (seasonId?: string) =>
   useQuery({
     queryKey: ['team-ranks', seasonId ?? 'current'],
