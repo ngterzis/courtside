@@ -53,7 +53,6 @@ export const MOCK_GAMES: Game[] = [
     teamScore: 58,
     opponentScore: 64,
     stats: {
-      minutes: 28,
       points: 8,
       rebounds: 5,
       assists: 3,
@@ -80,7 +79,6 @@ export const MOCK_GAMES: Game[] = [
     teamScore: 71,
     opponentScore: 63,
     stats: {
-      minutes: 30,
       points: 14,
       rebounds: 7,
       assists: 5,
@@ -107,7 +105,6 @@ export const MOCK_GAMES: Game[] = [
     teamScore: 62,
     opponentScore: 69,
     stats: {
-      minutes: 31,
       points: 11,
       rebounds: 8,
       assists: 4,
@@ -134,7 +131,6 @@ export const MOCK_GAMES: Game[] = [
     teamScore: 78,
     opponentScore: 66,
     stats: {
-      minutes: 32,
       points: 18,
       rebounds: 10,
       assists: 6,
@@ -161,7 +157,6 @@ export const MOCK_GAMES: Game[] = [
     teamScore: 60,
     opponentScore: 67,
     stats: {
-      minutes: 29,
       points: 9,
       rebounds: 7,
       assists: 4,
@@ -188,7 +183,6 @@ export const MOCK_GAMES: Game[] = [
     teamScore: 80,
     opponentScore: 71,
     stats: {
-      minutes: 33,
       points: 19,
       rebounds: 8,
       assists: 6,
@@ -215,7 +209,6 @@ export const MOCK_GAMES: Game[] = [
     teamScore: 69,
     opponentScore: 74,
     stats: {
-      minutes: 30,
       points: 16,
       rebounds: 6,
       assists: 5,
@@ -242,7 +235,6 @@ export const MOCK_GAMES: Game[] = [
     teamScore: 84,
     opponentScore: 78,
     stats: {
-      minutes: 34,
       points: 22,
       rebounds: 9,
       assists: 7,
@@ -271,7 +263,6 @@ export const MOCK_GAMES: Game[] = [
 export const MOCK_SEASON_AVERAGES: SeasonAverages = {
   seasonId: 's_spring26',
   gamesPlayed: 8,
-  minutes: 30.9,
   points: 14.6,
   rebounds: 7.5,
   assists: 5.0,

@@ -21,7 +21,6 @@ export interface Season {
 }
 
 export interface GameStats {
-  minutes: number;
   points: number;
   rebounds: number;
   assists: number;
