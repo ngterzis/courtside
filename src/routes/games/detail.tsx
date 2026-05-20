@@ -113,10 +113,10 @@ export default function GameDetailRoute() {
   const isPb = (stat: keyof GameStats) => personalBests.includes(stat);
   const hasPb = personalBests.length > 0;
 
-  const gameFgPct = calcFgPct(stats);
-  const gameThreePct = calcThreePct(stats);
-  const gameFtPct = calcFtPct(stats);
-  const gameTsPct = calcTsPct(stats);
+  const gameFgPct = stats.fgPct ?? calcFgPct(stats);
+  const gameThreePct = stats.threePct ?? calcThreePct(stats);
+  const gameFtPct = stats.ftPct ?? calcFtPct(stats);
+  const gameTsPct = stats.tsPct ?? calcTsPct(stats);
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-4 lg:px-8 lg:py-8">

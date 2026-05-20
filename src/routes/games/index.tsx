@@ -121,7 +121,7 @@ export default function GamesRoute() {
                 <span className="mr-3.5">{stats.assists} AST</span>
                 <span className="mr-3.5">{stats.steals} STL</span>
                 <span className="mr-3.5">{stats.turnovers} TOV</span>
-                <span>{pct(calcFgPct(stats))} FG</span>
+                <span>{pct(stats.fgPct ?? calcFgPct(stats))} FG</span>
               </div>
               {game.coachNote && (
                 <blockquote className="mt-2.5 border-t border-dashed border-ink/20 pt-2.5 text-sm italic text-ink/80">
@@ -188,11 +188,11 @@ export default function GamesRoute() {
                       <td className="px-3 py-2.5 font-mono text-[11px]">{stats.steals}</td>
                       <td className="px-3 py-2.5 font-mono text-[11px]">{stats.turnovers}</td>
                       <td className="px-3 py-2.5 font-mono text-[11px]">{stats.fouls}</td>
-                      <td className="px-3 py-2.5 font-mono text-[11px]">{pct(calcFgPct(stats))}</td>
-                      <td className="px-3 py-2.5 font-mono text-[11px]">{pct(calcThreePct(stats))}</td>
-                      <td className="px-3 py-2.5 font-mono text-[11px]">{pct(calcFtPct(stats))}</td>
+                      <td className="px-3 py-2.5 font-mono text-[11px]">{pct(stats.fgPct ?? calcFgPct(stats))}</td>
+                      <td className="px-3 py-2.5 font-mono text-[11px]">{pct(stats.threePct ?? calcThreePct(stats))}</td>
+                      <td className="px-3 py-2.5 font-mono text-[11px]">{pct(stats.ftPct ?? calcFtPct(stats))}</td>
                       <td className={`px-3 py-2.5 font-mono text-[11px] ${hasPb ? 'font-bold text-primary' : ''}`}>
-                        {pct(calcTsPct(stats))}
+                        {pct(stats.tsPct ?? calcTsPct(stats))}
                       </td>
                       <td className="px-3 py-2.5 text-[11px] text-ink-70">
                         {game.coachNote ? (

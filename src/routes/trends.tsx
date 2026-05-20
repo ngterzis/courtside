@@ -30,7 +30,7 @@ export default function TrendsRoute() {
   }, [games, range]);
 
   const ptsTrend  = filtered.map((g): TrendPoint => ({ date: g.date, value: g.stats.points,    opponent: g.opponent }));
-  const tsTrend   = filtered.map((g): TrendPoint => ({ date: g.date, value: Math.round(computeTS(g.stats) * 100), opponent: g.opponent }));
+  const tsTrend   = filtered.map((g): TrendPoint => ({ date: g.date, value: Math.round((g.stats.tsPct ?? computeTS(g.stats)) * 100), opponent: g.opponent }));
   const astTrend  = filtered.map((g): TrendPoint => ({ date: g.date, value: g.stats.assists,   opponent: g.opponent }));
   const rebTrend  = filtered.map((g): TrendPoint => ({ date: g.date, value: g.stats.rebounds,  opponent: g.opponent }));
   const tovTrend  = filtered.map((g): TrendPoint => ({ date: g.date, value: g.stats.turnovers, opponent: g.opponent }));
