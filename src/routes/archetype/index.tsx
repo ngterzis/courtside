@@ -91,12 +91,6 @@ export default function ArchetypeRoute() {
             <span className="font-mono text-[10px] uppercase tracking-wider text-white/50">
               AI-generated · updated today
             </span>
-            <Link
-              to="/archetype/history"
-              className="flex items-center gap-0.5 text-xs font-semibold text-white/80 transition-opacity hover:text-white"
-            >
-              History <ChevronRight className="h-3.5 w-3.5" />
-            </Link>
           </div>
         </div>
       </div>
@@ -183,12 +177,6 @@ export default function ArchetypeRoute() {
         </div>
 
         <div className="mt-4 flex gap-3">
-          <Link
-            to="/archetype/history"
-            className="flex flex-1 items-center justify-center rounded-lg border border-ink/20 bg-white py-2.5 text-[13px] font-semibold text-ink transition-colors hover:bg-paper-deep"
-          >
-            View history
-          </Link>
           <Link
             to="/chat"
             className="flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2.5 text-[13px] font-semibold text-white transition-opacity hover:opacity-90"

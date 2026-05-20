@@ -6,7 +6,6 @@ import DashboardRoute from './routes/dashboard';
 import LoginRoute from './routes/login';
 import OnboardingRoute from './routes/onboarding';
 import ArchetypeRoute from './routes/archetype';
-import ArchetypeHistoryRoute from './routes/archetype/history';
 import GamesRoute from './routes/games';
 import GameDetailRoute from './routes/games/detail';
 import TrendsRoute from './routes/trends';
@@ -34,7 +33,6 @@ export default function App() {
         <Route element={<AppLayout />}>
           <Route index element={<DashboardRoute />} />
           <Route path="/archetype" element={<ArchetypeRoute />} />
-          <Route path="/archetype/history" element={<ArchetypeHistoryRoute />} />
           <Route path="/games" element={<GamesRoute />} />
           <Route path="/games/:gameId" element={<GameDetailRoute />} />
           <Route path="/trends" element={<TrendsRoute />} />
