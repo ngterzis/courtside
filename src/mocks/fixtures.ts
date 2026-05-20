@@ -313,6 +313,13 @@ export const MOCK_ARCHETYPE: Archetype = {
       comment: 'scores inside the flow',
     },
   ],
+  scores: [
+    { name: 'Playmaker', score: 94, isPrimary: true },
+    { name: 'Efficient Scorer', score: 81, isSecondary: true },
+    { name: 'Defensive Specialist', score: 64 },
+    { name: 'Perimeter Scorer', score: 42 },
+    { name: 'Rebounder', score: 38 },
+  ],
   assignedAt: '2026-04-19T00:00:00.000Z',
   seasonId: 's_spring26',
 };

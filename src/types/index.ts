@@ -85,11 +85,19 @@ export interface ArchetypeReceiptLine {
   comment: string;
 }
 
+export interface ArchetypeScore {
+  name: string;
+  score: number;
+  isPrimary?: boolean;
+  isSecondary?: boolean;
+}
+
 export interface Archetype {
   primary: ArchetypeName;
   secondary: ArchetypeName;
   explanation: string;
   receipt: ArchetypeReceiptLine[];
+  scores?: ArchetypeScore[];
   assignedAt: string;
   seasonId: SeasonId;
 }
