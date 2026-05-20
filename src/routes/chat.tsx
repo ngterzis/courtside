@@ -96,11 +96,6 @@ export default function ChatRoute() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const firstName = me?.name.split(' ')[0] ?? 'there';
-  const isThinking =
-    streaming &&
-    messages.length > 0 &&
-    messages[messages.length - 1].role === 'assistant' &&
-    messages[messages.length - 1].content === '';
 
   // Auto-scroll on new content
   useEffect(() => {
