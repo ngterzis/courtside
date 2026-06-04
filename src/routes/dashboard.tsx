@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Bell } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ArchetypeHero } from '@/components/ArchetypeHero';
@@ -8,10 +9,11 @@ import { SeasonChip } from '@/components/SeasonChip';
 import {
   useArchetype,
   useCurrentSeason,
+  useGames,
   useLastGame,
   useMe,
   useSeasonAverages,
-  useTrend,
+  useTeamRanks,
 } from '@/lib/queries';
 import { fmt1, pct } from '@/lib/stats';
 
@@ -20,9 +22,20 @@ export default function DashboardRoute() {
   const { data: season } = useCurrentSeason();
   const { data: archetype } = useArchetype();
   const { data: averages } = useSeasonAverages();
+  const { data: teamRanks = [] } = useTeamRanks();
   const { data: lastGame } = useLastGame();
-  const { data: astTrend = [] } = useTrend('ast');
-  const { data: tovTrend = [] } = useTrend('tov');
+  const { data: games = [] } = useGames();
+
+  const astTrend = useMemo(
+    () => games.map((g) => ({ date: g.date, value: g.stats.assists, opponent: g.opponent })),
+    [games],
+  );
+  const tovTrend = useMemo(
+    () => games.map((g) => ({ date: g.date, value: g.stats.turnovers, opponent: g.opponent })),
+    [games],
+  );
+
+  const rankLabel = (stat: string) => teamRanks.find((r) => r.stat === stat)?.label;
 
   const loading = !me || !season || !archetype || !averages || !lastGame;
 
@@ -65,10 +78,10 @@ export default function DashboardRoute() {
 
       {/* Stat strip */}
       <div className="mb-4 grid grid-cols-4 gap-2 lg:mb-6 lg:gap-3">
-        <StatCard label="PTS" value={fmt1(averages.points)} delta="+2 vs prior" accent />
-        <StatCard label="AST" value={fmt1(averages.assists)} delta="#1 on team" accent />
-        <StatCard label="REB" value={fmt1(averages.rebounds)} delta="above avg" />
-        <StatCard label="TS%" value={pct(averages.tsPct ?? 0)} delta="+4%" accent />
+        <StatCard label="PTS" value={fmt1(averages.points)} delta={rankLabel('points')} accent />
+        <StatCard label="AST" value={fmt1(averages.assists)} delta={rankLabel('assists')} accent />
+        <StatCard label="REB" value={fmt1(averages.rebounds)} delta={rankLabel('rebounds')} />
+        <StatCard label="TS%" value={pct(averages.tsPct ?? 0)} delta={rankLabel('tsPct')} accent />
       </div>
 
       {/* Trajectory + last game — single column on mobile, 2-col on desktop */}
