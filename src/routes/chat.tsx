@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Send } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { useMe, useCurrentSeason } from '@/lib/queries';
+import { getToken } from '@/lib/auth';
 import { cn } from '@/lib/utils';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -124,9 +127,13 @@ export default function ChatRoute() {
     setStreaming(true);
 
     try {
+      const token = getToken();
       const res = await fetch('/api/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({
           messages: nextMessages.map(({ role, content }) => ({ role, content })),
         }),
@@ -234,6 +241,34 @@ export default function ChatRoute() {
                 >
                   {msg.role === 'assistant' && msg.content === '' ? (
                     <ThinkingDots />
+                  ) : msg.role === 'assistant' ? (
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                        strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                        h2: ({ children }) => <p className="mb-1 font-bold">{children}</p>,
+                        h3: ({ children }) => <p className="mb-1 font-semibold">{children}</p>,
+                        ul: ({ children }) => <ul className="mb-2 list-disc pl-4">{children}</ul>,
+                        ol: ({ children }) => <ol className="mb-2 list-decimal pl-4">{children}</ol>,
+                        li: ({ children }) => <li className="mb-0.5">{children}</li>,
+                        table: ({ children }) => (
+                          <div className="my-2 overflow-x-auto">
+                            <table className="w-full border-collapse text-[12px]">{children}</table>
+                          </div>
+                        ),
+                        th: ({ children }) => (
+                          <th className="border border-ink/20 bg-paper-deep px-2 py-1 text-left font-semibold">
+                            {children}
+                          </th>
+                        ),
+                        td: ({ children }) => (
+                          <td className="border border-ink/20 px-2 py-1">{children}</td>
+                        ),
+                      }}
+                    >
+                      {msg.content}
+                    </ReactMarkdown>
                   ) : (
                     msg.content
                   )}

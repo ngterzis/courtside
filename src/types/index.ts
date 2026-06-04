@@ -114,3 +114,18 @@ export interface TrendPoint {
   gameId?: GameId;
   opponent?: string;
 }
+
+export type NotificationType =
+  | 'personal_best'
+  | 'stats_ready'
+  | 'coach_note'
+  | 'archetype_changed'
+  | 'weekly_summary';
+
+export interface Notification {
+  id: string;
+  type: NotificationType;
+  payload: Record<string, unknown>;
+  createdAt: string;
+  readAt: string | null;
+}

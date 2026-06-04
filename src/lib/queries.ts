@@ -1,82 +1,95 @@
 import { useQuery } from '@tanstack/react-query';
-import {
-  MOCK_ARCHETYPE,
-  MOCK_CURRENT_SEASON,
-  MOCK_GAMES,
-  MOCK_PLAYER,
-  MOCK_SEASONS,
-  MOCK_SEASON_AVERAGES,
-  MOCK_TEAM_RANKS,
-  astTrend,
-  ptsTrend,
-  tovTrend,
-} from '@/mocks/fixtures';
-import type { TrendPoint } from '@/types';
+import { apiFetch } from './api';
+import type {
+  Archetype,
+  Game,
+  Notification,
+  Player,
+  Season,
+  SeasonAverages,
+  TeamRank,
+} from '@/types';
 
-// Pretend network latency so loading states are exercised.
-const delay = <T,>(value: T, ms = 120): Promise<T> =>
-  new Promise((r) => setTimeout(() => r(value), ms));
-
-export const useMe = () => useQuery({ queryKey: ['me'], queryFn: () => delay(MOCK_PLAYER) });
+export const useMe = () =>
+  useQuery({
+    queryKey: ['me'],
+    queryFn: () => apiFetch<Player>('/api/me'),
+  });
 
 export const useSeasons = () =>
-  useQuery({ queryKey: ['seasons'], queryFn: () => delay(MOCK_SEASONS) });
+  useQuery({
+    queryKey: ['seasons'],
+    queryFn: () => apiFetch<Season[]>('/api/seasons'),
+  });
 
 export const useCurrentSeason = () =>
   useQuery({
     queryKey: ['seasons', 'current'],
-    queryFn: () => delay(MOCK_CURRENT_SEASON),
+    queryFn: () => apiFetch<Season>('/api/seasons/current'),
   });
 
 export const useArchetype = (seasonId?: string) =>
   useQuery({
     queryKey: ['archetype', seasonId ?? 'current'],
-    queryFn: () => delay(MOCK_ARCHETYPE),
+    queryFn: () =>
+      apiFetch<Archetype>(
+        `/api/me/archetype${seasonId ? `?seasonId=${seasonId}` : ''}`,
+      ),
+  });
+
+export const useArchetypeHistory = () =>
+  useQuery({
+    queryKey: ['archetype', 'history'],
+    queryFn: () => apiFetch<Archetype[]>('/api/me/archetype/history'),
   });
 
 export const useSeasonAverages = (seasonId?: string) =>
   useQuery({
     queryKey: ['season-averages', seasonId ?? 'current'],
-    queryFn: () => delay(MOCK_SEASON_AVERAGES),
+    queryFn: () =>
+      apiFetch<SeasonAverages>(
+        `/api/me/season-averages${seasonId ? `?seasonId=${seasonId}` : ''}`,
+      ),
   });
 
 export const useGames = (seasonId?: string) =>
   useQuery({
     queryKey: ['games', { seasonId: seasonId ?? 'current' }],
-    queryFn: () => delay(MOCK_GAMES),
+    queryFn: async () => {
+      const data = await apiFetch<{ games: Game[]; total: number }>(
+        `/api/me/games${seasonId ? `?seasonId=${seasonId}` : ''}`,
+      );
+      return data.games;
+    },
   });
 
 export const useLastGame = (seasonId?: string) =>
   useQuery({
     queryKey: ['games', 'last', { seasonId: seasonId ?? 'current' }],
-    queryFn: () => delay(MOCK_GAMES[MOCK_GAMES.length - 1]),
+    queryFn: () =>
+      apiFetch<Game | null>(
+        `/api/me/games/last${seasonId ? `?seasonId=${seasonId}` : ''}`,
+      ),
   });
 
 export const useGame = (gameId?: string) =>
   useQuery({
     queryKey: ['game', gameId],
-    queryFn: () => delay(MOCK_GAMES.find((g) => g.id === gameId) ?? null),
+    queryFn: () => apiFetch<Game>(`/api/games/${gameId}`),
     enabled: !!gameId,
   });
 
 export const useTeamRanks = (seasonId?: string) =>
   useQuery({
     queryKey: ['team-ranks', seasonId ?? 'current'],
-    queryFn: () => delay(MOCK_TEAM_RANKS),
+    queryFn: () =>
+      apiFetch<TeamRank[]>(
+        `/api/me/team-ranks${seasonId ? `?seasonId=${seasonId}` : ''}`,
+      ),
   });
 
-export type TrendMetric = 'pts' | 'ast' | 'tov' | 'reb' | 'ts';
-
-const TREND_DATA: Record<TrendMetric, TrendPoint[]> = {
-  pts: ptsTrend,
-  ast: astTrend,
-  tov: tovTrend,
-  reb: [],
-  ts: [],
-};
-
-export const useTrend = (metric: TrendMetric, range: 'last5' | 'season' | 'all' = 'season') =>
+export const useNotifications = () =>
   useQuery({
-    queryKey: ['trends', { metric, range }],
-    queryFn: () => delay(TREND_DATA[metric] ?? []),
+    queryKey: ['notifications'],
+    queryFn: () => apiFetch<Notification[]>('/api/me/notifications'),
   });
