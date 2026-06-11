@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, ChevronRight, MessageSquare } from 'lucide-react';
+import { ArrowLeft, MessageSquare } from 'lucide-react';
 import { RadarChart } from '@/components/RadarChart';
 import { useArchetype, useMe, useTeamRanks } from '@/lib/queries';
 
