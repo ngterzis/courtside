@@ -7,7 +7,7 @@ about their own game.
 
 ## Demo
 
-[![Watch the Courtside demo](https://youtu.be/d4UmFKxlz5Y)
+[![Watch the Courtside demo](https://img.youtube.com/vi/d4UmFKxlz5Y/maxresdefault.jpg)](https://youtu.be/d4UmFKxlz5Y)
 
 ## Stack
 
