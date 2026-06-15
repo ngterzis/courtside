@@ -133,9 +133,21 @@ Pushes to `main` trigger `.github/workflows/deploy.yml`: build, then sync `dist/
 and invalidate CloudFront (AWS auth via OIDC). Requires the `AWS_FRONTEND_ROLE_ARN`,
 `S3_BUCKET`, and `CLOUDFRONT_DISTRIBUTION_ID` repo secrets.
 
+## Related repos
+
+Courtside is split across three repositories:
+
+- **[courtside](https://github.com/ngterzis/courtside)** — this repo; the React + TypeScript frontend.
+- **[courtside-backend](https://github.com/ngterzis/courtside-backend)** — API implementing the [`BACKEND.md`](./BACKEND.md) contract.
+- **[courtside-infra](https://github.com/ngterzis/courtside-infra)** — infrastructure / deployment (AWS).
+
 ## Related docs
 
 - [`BACKEND.md`](./BACKEND.md) — API contract, data models, auth, chat SSE format.
 - [`design_handoff/README.md`](./design_handoff/README.md) — product spec and wireframes.
+
+## License
+
+Released under the [MIT License](./LICENSE).
 </content>
 </invoke>
