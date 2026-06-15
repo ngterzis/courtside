@@ -1,12 +1,13 @@
 # Courtside
 
-Player-facing app for a rec-league basketball league. Players check their stats, understand their AI-assigned *archetype* (Playmaker, Efficient Scorer, etc.), track progress across a season, and chat with an AI about their game.
+Player-facing web app for a rec-league basketball league. Players sign in, check their
+stats, understand their AI-assigned **archetype** (Playmaker, Efficient Scorer, Glass
+Cleaner, …), track progress across a season, browse their game log, and chat with an AI
+about their own game.
 
-Product spec and wireframes live in [`design_handoff/README.md`](./design/README.md) — read that for the *why*. This README covers the *what*: the code as it currently stands.
+## Demo
 
-## Current status
-
-v0.0.1 — scaffold stage. The routing shell and the **Dashboard (V2 layout)** are built against mock data. Everything else is a placeholder route.
+[![Watch the Courtside demo](https://youtu.be/d4UmFKxlz5Y)
 
 ## Stack
 
@@ -15,93 +16,107 @@ v0.0.1 — scaffold stage. The routing shell and the **Dashboard (V2 layout)** a
 | Build | Vite 5 |
 | Framework | React 18 + TypeScript |
 | Routing | React Router v6 |
-| Server state | TanStack Query v5 (mock-backed for now) |
+| Server state | TanStack Query v5 |
 | UI state | Zustand |
 | Styling | Tailwind CSS v3 |
 | Primitives | shadcn/ui style (Radix Slot + CVA), copy-paste not a lib |
 | Charts | Recharts |
 | Icons | Lucide |
 
-## Commands
+## Getting started
 
 ```bash
 npm install
+npm run dev        # start Vite dev server on http://localhost:5173
+```
+
+The dev server proxies `/api/*` to `http://localhost:8000` (see `vite.config.ts`), so run
+your backend there. The full API contract the frontend expects lives in
+[`BACKEND.md`](./BACKEND.md) — it's the single source of truth for endpoints and JSON shapes.
+
+### Commands
+
+```bash
 npm run dev        # start Vite dev server
 npm run build      # tsc -b && vite build
 npm run typecheck  # tsc -b --noEmit
 npm run preview    # preview production build
 ```
 
-## File layout
+## How it works
+
+- **Auth** — JWT stored in `localStorage` and sent as a Bearer token on every request
+  (`src/lib/auth.ts`, `src/lib/api.ts`). A `401` clears the token and redirects to `/login`.
+- **Route guards** (`src/App.tsx`) — `RequireAuth` gates the app, `RedirectIfAuthed` bounces
+  logged-in users away from `/login`, and `RequireOnboarded` sends players with no
+  `onboardedAt` to `/onboarding`.
+- **Data** — every screen pulls from typed query hooks in `src/lib/queries.ts`
+  (`useMe`, `useArchetype`, `useGames`, `useSeasonAverages`, `useTeamRanks`, `useTrend`, …).
+  The backend is authoritative for derived stats; `src/lib/stats.ts` is the client-side
+  fallback when a field is absent.
+- **Chat** — `/chat` streams responses over SSE from `POST /api/chat`
+  (`src/routes/chat.tsx`).
+
+## Routes
+
+| Route | Screen |
+|---|---|
+| `/` | Dashboard — archetype hero, stat strip, last game, trend charts |
+| `/login` | Email/password sign-in |
+| `/onboarding` | Jersey number + position setup (first login) |
+| `/archetype` | Archetype detail — radar chart, fit scores, receipt explanation |
+| `/archetype/history` | Archetype across seasons |
+| `/games` | Game log — card list on mobile, table on desktop |
+| `/games/:gameId` | Single-game box score + coach note |
+| `/trends` | PTS / TS% / AST–TOV / REB trend charts |
+| `/chat` | AI chat about the player's stats (SSE streaming) |
+| `/notifications` | Personal bests, stats-ready, coach notes, weekly summary |
+| `/settings` | Account + sign out |
+
+Unknown paths redirect to `/`.
+
+## Project layout
 
 ```
 src/
-├── main.tsx                    # ReactDOM root; wraps App in BrowserRouter
-├── App.tsx                     # QueryClient + <Routes>; all canonical routes wired
-├── index.css                   # Tailwind base/components/utilities + focus ring
+├── main.tsx                  # ReactDOM root; wraps App in BrowserRouter
+├── App.tsx                   # QueryClient + route tree + auth/onboarding guards
+├── index.css                 # Tailwind base/components/utilities
 │
-├── routes/                     # One file per screen (folder for nested routes)
-│   ├── dashboard.tsx           # ✅ Built — V2 archetype-hero layout
-│   ├── login.tsx               # minimal form; submit → /
-│   ├── onboarding.tsx          # placeholder
-│   ├── archetype/index.tsx     # placeholder
-│   ├── archetype/history.tsx   # placeholder
-│   ├── games/index.tsx         # placeholder
-│   ├── games/detail.tsx        # placeholder; reads :gameId param
-│   ├── trends.tsx              # placeholder
-│   ├── chat.tsx                # placeholder
-│   ├── notifications.tsx       # placeholder
-│   ├── settings.tsx            # placeholder
-│   └── _placeholder.tsx        # shared <Placeholder/> for unbuilt routes
+├── routes/                   # one file per screen (folder for nested routes)
 │
 ├── components/
 │   ├── layout/
-│   │   ├── AppLayout.tsx       # Sidebar + <Outlet/> + BottomNav + ChatFab
-│   │   └── AuthLayout.tsx      # Centered card shell for login/onboarding
-│   ├── ui/                     # shadcn-style primitives (copy-paste, not a dep)
-│   │   ├── button.tsx          # CVA variants: default/accent/outline/ghost/onDark/solidLight
-│   │   └── card.tsx
-│   ├── Sidebar.tsx             # desktop nav (lg+); hidden on mobile
-│   ├── BottomNav.tsx           # mobile nav (4 tabs); hidden lg+
-│   ├── ChatFab.tsx             # persistent purple FAB; hidden on /chat
-│   ├── ArchetypeHero.tsx       # purple hero card; links to /archetype
-│   ├── StatCard.tsx            # label / value / delta — used in stat strip
-│   ├── TrendChart.tsx          # single-metric line + 3-game rolling avg
-│   ├── DualTrendChart.tsx      # two-metric overlay (signature AST vs TOV)
-│   ├── LastGameCard.tsx        # accent-soft card w/ coach-note block
-│   ├── JerseyAvatar.tsx        # purple-soft circle with jersey number
-│   └── SeasonChip.tsx          # "Spring '26 ▾" — opens season switcher (TODO)
+│   │   ├── AppLayout.tsx      # Sidebar + <Outlet/> + BottomNav + ChatFab
+│   │   └── AuthLayout.tsx     # centered card shell for login/onboarding
+│   ├── ui/                    # shadcn-style primitives (button, card)
+│   ├── Sidebar.tsx            # desktop nav (lg+)
+│   ├── BottomNav.tsx          # mobile nav (4 tabs)
+│   ├── ChatFab.tsx            # persistent FAB; hidden on /chat
+│   ├── ArchetypeHero.tsx      # purple hero card → /archetype
+│   ├── StatCard.tsx           # label / value / delta
+│   ├── RadarChart.tsx         # team-rank radar for archetype detail
+│   ├── TrendChart.tsx         # single-metric line + rolling average
+│   ├── DualTrendChart.tsx     # two-metric overlay (AST vs TOV)
+│   ├── LastGameCard.tsx       # last-game card with coach note
+│   ├── JerseyAvatar.tsx       # circle with jersey number
+│   └── SeasonChip.tsx         # season switcher
 │
 ├── lib/
-│   ├── utils.ts                # cn() — clsx + tailwind-merge
-│   ├── stats.ts                # fgPct / threePct / ftPct / tsPct / pct / fmt1
-│   └── queries.ts              # useMe / useArchetype / useGames / useTrend etc.
-│                               #   Query keys match README spec exactly.
-│                               #   Backed by mock fixtures + 120ms delay.
+│   ├── api.ts                # apiFetch — Bearer auth, 401 handling, ApiError
+│   ├── auth.ts               # token get/set/clear in localStorage
+│   ├── queries.ts            # typed TanStack Query hooks (one per endpoint)
+│   ├── stats.ts              # fgPct / threePct / ftPct / tsPct fallbacks
+│   └── utils.ts              # cn() — clsx + tailwind-merge
 │
-├── mocks/
-│   └── fixtures.ts             # 1 player, 3 seasons, 8 games, archetype, trends
-│
-├── stores/
-│   └── ui-store.ts             # Zustand: activeSeasonId, chatOpen
-│
-└── types/
-    └── index.ts                # Player, Season, Game, GameStats, Archetype, etc.
+├── mocks/fixtures.ts         # sample data for local dev
+├── stores/ui-store.ts        # Zustand: activeSeasonId, chatOpen
+└── types/index.ts            # Player, Season, Game, GameStats, Archetype, …
 ```
-
-## How the dashboard wires together
-
-`routes/dashboard.tsx` is the reference for how every other screen should be built:
-
-1. Pull data via the typed query hooks in `lib/queries.ts` (`useMe`, `useArchetype`, `useSeasonAverages`, `useLastGame`, `useTrend`).
-2. Compose reusable components from `components/`. No inline styles, no ad-hoc layout.
-3. Mobile-first: single column; use `lg:` breakpoints to switch to multi-column.
-
-Loading states are handled at the route level for now (simple skeleton). Error boundaries are not yet wired.
 
 ## Design tokens
 
-All tokens from the handoff `tokens.ts` are baked into `tailwind.config.js`:
+Tokens from the design handoff are baked into `tailwind.config.js`:
 
 - `bg-primary` `#974ca8` — archetype hero, active nav, primary CTAs
 - `bg-primary-soft` `#f0e3f3` — chip backgrounds
@@ -111,32 +126,16 @@ All tokens from the handoff `tokens.ts` are baked into `tailwind.config.js`:
 - `bg-paper` `#fbfaf6` — page background
 - `bg-paper-deep` `#f3f0e8` — sidebar / card alt
 - `shadow-card` / `shadow-raised` — resting and lifted cards
-- `rounded-sm` (6px inputs), `rounded-md` (10px cards), `rounded-full` (pills/FAB)
 
-**Do not** import the wireframe `WK.*` constants or reintroduce the `Caveat` hand-drawn font — those were for the sketchy handoff only.
+## Deployment
 
-## Routing
+Pushes to `main` trigger `.github/workflows/deploy.yml`: build, then sync `dist/` to S3
+and invalidate CloudFront (AWS auth via OIDC). Requires the `AWS_FRONTEND_ROLE_ARN`,
+`S3_BUCKET`, and `CLOUDFRONT_DISTRIBUTION_ID` repo secrets.
 
-All canonical routes from the handoff are wired. `AppLayout` is the shell for authenticated app routes; `AuthLayout` is the split for `/login` and `/onboarding`. Unknown paths redirect to `/`.
+## Related docs
 
-| Route | Status |
-|---|---|
-| `/` | ✅ Dashboard V2 |
-| `/login` | stub form (submit → `/`) |
-| `/onboarding` | placeholder |
-| `/archetype`, `/archetype/history` | placeholder |
-| `/games`, `/games/:gameId` | placeholder |
-| `/trends` | placeholder |
-| `/chat` | placeholder (FAB opens it) |
-| `/notifications` | placeholder (bell icon opens it) |
-| `/settings` | placeholder |
-
-## What's next
-
-Per the handoff's build order:
-
-1. Archetype detail (`/archetype`) — radar chart, receipt explanation.
-2. Game log (`/games`) — card list mobile, 11-column table desktop.
-3. Trends (`/trends`) — PTS / TS% / AST-TOV / REB charts.
-4. AI chat (`/chat`) — needs real backend.
-5. Swap mock `lib/queries.ts` for a real `lib/api.ts` once the API exists.
+- [`BACKEND.md`](./BACKEND.md) — API contract, data models, auth, chat SSE format.
+- [`design_handoff/README.md`](./design_handoff/README.md) — product spec and wireframes.
+</content>
+</invoke>
