@@ -148,6 +148,6 @@ Courtside is split across three repositories:
 
 ## License
 
-Released under the [MIT License](./LICENSE).
+Released under the [GNU AGPLv3 License](./LICENSE).
 </content>
 </invoke>
