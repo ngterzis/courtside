@@ -33,15 +33,12 @@ export function LastGameCard({ game }: Props) {
         {homeAway === 'H' ? 'vs' : '@'} {opponent} · {stats.points} PTS
       </div>
       <div className="mt-1 text-xs text-ink-70 tabular">
-        {stats.assists} AST · {stats.rebounds} REB · {stats.steals} STL ·{' '}
-        {stats.turnovers} TOV
+        {stats.assists} AST · {stats.rebounds} REB · {stats.steals} STL · {stats.turnovers} TOV
       </div>
       {coachNote && (
         <blockquote className="mt-3 border-l-2 border-accent/60 pl-3 text-sm italic text-ink/85">
           "{coachNote.text}"
-          <span className="ml-2 text-[11px] not-italic text-ink-70">
-            — {coachNote.authorName}
-          </span>
+          <span className="ml-2 text-[11px] not-italic text-ink-70">— {coachNote.authorName}</span>
         </blockquote>
       )}
       <div className="mt-3 flex gap-2">

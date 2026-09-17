@@ -63,12 +63,21 @@ describe('apiFetch', () => {
     const error = await apiFetch('/api/games/nope').catch((e: unknown) => e);
 
     expect(error).toBeInstanceOf(ApiError);
-    expect(error).toMatchObject({ message: 'Game not found', status: 404, body: { message: 'Game not found' } });
+    expect(error).toMatchObject({
+      message: 'Game not found',
+      status: 404,
+      body: { message: 'Game not found' },
+    });
   });
 
   it('falls back to the status text when the error body is not JSON', async () => {
-    fetchMock.mockResolvedValue(new Response('<html>Bad Gateway</html>', { status: 502, statusText: 'Bad Gateway' }));
+    fetchMock.mockResolvedValue(
+      new Response('<html>Bad Gateway</html>', { status: 502, statusText: 'Bad Gateway' }),
+    );
 
-    await expect(apiFetch('/api/me')).rejects.toMatchObject({ message: 'Bad Gateway', status: 502 });
+    await expect(apiFetch('/api/me')).rejects.toMatchObject({
+      message: 'Bad Gateway',
+      status: 502,
+    });
   });
 });

@@ -42,7 +42,12 @@ export function ArchetypeHero({ archetype, variant = 'compact', className }: Pro
 
         <hr className="my-4 border-t border-dashed border-white/25" />
 
-        <p className={cn('text-white/90', full ? 'text-base leading-relaxed' : 'text-sm leading-relaxed')}>
+        <p
+          className={cn(
+            'text-white/90',
+            full ? 'text-base leading-relaxed' : 'text-sm leading-relaxed',
+          )}
+        >
           {archetype.explanation}
         </p>
 

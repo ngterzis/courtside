@@ -22,7 +22,14 @@ const line = (overrides: Partial<GameStats> = {}): GameStats => ({
 
 describe('shooting percentages', () => {
   it('divides makes by attempts', () => {
-    const s = line({ fgMade: 6, fgAttempted: 12, threeMade: 2, threeAttempted: 5, ftMade: 3, ftAttempted: 4 });
+    const s = line({
+      fgMade: 6,
+      fgAttempted: 12,
+      threeMade: 2,
+      threeAttempted: 5,
+      ftMade: 3,
+      ftAttempted: 4,
+    });
 
     expect(fgPct(s)).toBe(0.5);
     expect(threePct(s)).toBe(0.4);

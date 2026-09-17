@@ -10,7 +10,12 @@ async function collect(stream: ReadableStream<Uint8Array>) {
 
 describe('readSSE', () => {
   it('yields the text of each event in order', async () => {
-    const stream = streamFrom([sseEvent('You '), sseEvent('averaged '), sseEvent('5.0 AST'), SSE_DONE]);
+    const stream = streamFrom([
+      sseEvent('You '),
+      sseEvent('averaged '),
+      sseEvent('5.0 AST'),
+      SSE_DONE,
+    ]);
 
     expect(await collect(stream)).toEqual(['You ', 'averaged ', '5.0 AST']);
   });

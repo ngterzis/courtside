@@ -54,12 +54,8 @@ export default function DashboardRoute() {
       {/* Top bar */}
       <div className="mb-4 flex items-center justify-between lg:mb-6">
         <div>
-          <div className="text-[11px] uppercase tracking-wider text-ink-70">
-            {season.label}
-          </div>
-          <h1 className="text-xl font-bold tracking-tight lg:text-2xl">
-            hi, {firstName}
-          </h1>
+          <div className="text-[11px] uppercase tracking-wider text-ink-70">{season.label}</div>
+          <h1 className="text-xl font-bold tracking-tight lg:text-2xl">hi, {firstName}</h1>
         </div>
         <div className="flex items-center gap-2">
           <SeasonChip season={season} />
@@ -92,9 +88,7 @@ export default function DashboardRoute() {
               <div className="text-[10px] font-semibold uppercase tracking-wider text-ink-70">
                 Your trajectory
               </div>
-              <div className="text-sm font-semibold lg:text-base">
-                Assists vs Turnovers
-              </div>
+              <div className="text-sm font-semibold lg:text-base">Assists vs Turnovers</div>
             </div>
             <div className="flex items-center gap-2 text-[10px]">
               <span className="inline-flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 font-semibold text-accent-foreground">

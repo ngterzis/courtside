@@ -39,9 +39,7 @@ export default function LoginRoute() {
         courtside<span className="text-primary">.</span>
       </div>
       {error && (
-        <div className="mb-3 rounded-md bg-danger/10 px-3 py-2 text-sm text-danger">
-          {error}
-        </div>
+        <div className="mb-3 rounded-md bg-danger/10 px-3 py-2 text-sm text-danger">{error}</div>
       )}
       <form className="space-y-3" onSubmit={handleSubmit}>
         <input

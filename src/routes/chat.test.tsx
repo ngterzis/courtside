@@ -149,7 +149,9 @@ describe('ChatRoute', () => {
 
     await user.type(input(), 'hi{Enter}');
 
-    expect(await screen.findByText('Sorry, something went wrong. Please try again.')).toBeInTheDocument();
+    expect(
+      await screen.findByText('Sorry, something went wrong. Please try again.'),
+    ).toBeInTheDocument();
     expect(input()).toBeEnabled();
   });
 
@@ -159,7 +161,9 @@ describe('ChatRoute', () => {
 
     await user.type(input(), 'hi{Enter}');
 
-    expect(await screen.findByText('Sorry, something went wrong. Please try again.')).toBeInTheDocument();
+    expect(
+      await screen.findByText('Sorry, something went wrong. Please try again.'),
+    ).toBeInTheDocument();
   });
 
   it('ignores blank messages and shift+enter', async () => {

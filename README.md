@@ -13,19 +13,19 @@ about their own game.
 
 ## Stack
 
-| Concern | Library |
-|---|---|
-| Build | Vite 5 |
-| Framework | React 18 + TypeScript |
-| Routing | React Router v6 |
-| Server state | TanStack Query v5 |
-| Styling | Tailwind CSS v3 |
-| Primitives | shadcn/ui style (Radix Slot + CVA), copy-paste not a lib |
-| Charts | Recharts |
-| Icons | Lucide |
-| Linting & formatting | ESLint (typescript-eslint, react-hooks) + Prettier |
-| Unit & component tests | Vitest + React Testing Library |
-| End-to-end tests | Playwright |
+| Concern                | Library                                                  |
+| ---------------------- | -------------------------------------------------------- |
+| Build                  | Vite 5                                                   |
+| Framework              | React 18 + TypeScript                                    |
+| Routing                | React Router v6                                          |
+| Server state           | TanStack Query v5                                        |
+| Styling                | Tailwind CSS v3                                          |
+| Primitives             | shadcn/ui style (Radix Slot + CVA), copy-paste not a lib |
+| Charts                 | Recharts                                                 |
+| Icons                  | Lucide                                                   |
+| Linting & formatting   | ESLint (typescript-eslint, react-hooks) + Prettier       |
+| Unit & component tests | Vitest + React Testing Library                           |
+| End-to-end tests       | Playwright                                               |
 
 ## Getting started
 
@@ -58,13 +58,13 @@ npm run test:e2e   # end-to-end tests (Playwright; builds the app first)
 
 Tests focus on the logic most likely to break silently, not on layout:
 
-| Layer | What's covered | Where |
-|---|---|---|
-| Unit | SSE stream parsing: events split across network reads, multi-byte characters split mid-byte, `[DONE]`, malformed events, reader cleanup | `src/lib/sse.test.ts` |
-| Unit | Shooting percentages and True Shooting % formulas, including zero-attempt edge cases | `src/lib/stats.test.ts` |
-| Unit | `apiFetch`: bearer token, 401 → sign out + redirect, error messages | `src/lib/api.test.ts` |
-| Component | Chat: thinking indicator, incremental streaming into rendered markdown, conversation history sent to the API, error and empty-reply states | `src/routes/chat.test.tsx` |
-| End-to-end | Sign in → dashboard → ask the chat agent a question → follow-up, on desktop and mobile viewports | `e2e/chat.spec.ts` |
+| Layer      | What's covered                                                                                                                             | Where                      |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------- |
+| Unit       | SSE stream parsing: events split across network reads, multi-byte characters split mid-byte, `[DONE]`, malformed events, reader cleanup    | `src/lib/sse.test.ts`      |
+| Unit       | Shooting percentages and True Shooting % formulas, including zero-attempt edge cases                                                       | `src/lib/stats.test.ts`    |
+| Unit       | `apiFetch`: bearer token, 401 → sign out + redirect, error messages                                                                        | `src/lib/api.test.ts`      |
+| Component  | Chat: thinking indicator, incremental streaming into rendered markdown, conversation history sent to the API, error and empty-reply states | `src/routes/chat.test.tsx` |
+| End-to-end | Sign in → dashboard → ask the chat agent a question → follow-up, on desktop and mobile viewports                                           | `e2e/chat.spec.ts`         |
 
 The E2E suite runs against the production build with the API stubbed from
 `src/mocks/fixtures.ts` (`e2e/mock-api.ts`), so it needs no backend. Charts and purely
@@ -92,19 +92,19 @@ every pull request and push to `main`. Deploys only run once CI passes.
 
 ## Routes
 
-| Route | Screen |
-|---|---|
-| `/` | Dashboard — archetype hero, stat strip, last game, trend charts |
-| `/login` | Email/password sign-in |
-| `/onboarding` | Jersey number + position setup (first login) |
-| `/archetype` | Archetype detail — radar chart, fit scores, receipt explanation |
-| `/archetype/history` | Archetype across seasons |
-| `/games` | Game log — card list on mobile, table on desktop |
-| `/games/:gameId` | Single-game box score + coach note |
-| `/trends` | PTS / TS% / AST–TOV / REB trend charts |
-| `/chat` | AI chat about the player's stats (SSE streaming) |
-| `/notifications` | Personal bests, stats-ready, coach notes, weekly summary |
-| `/settings` | Account + sign out |
+| Route                | Screen                                                          |
+| -------------------- | --------------------------------------------------------------- |
+| `/`                  | Dashboard — archetype hero, stat strip, last game, trend charts |
+| `/login`             | Email/password sign-in                                          |
+| `/onboarding`        | Jersey number + position setup (first login)                    |
+| `/archetype`         | Archetype detail — radar chart, fit scores, receipt explanation |
+| `/archetype/history` | Archetype across seasons                                        |
+| `/games`             | Game log — card list on mobile, table on desktop                |
+| `/games/:gameId`     | Single-game box score + coach note                              |
+| `/trends`            | PTS / TS% / AST–TOV / REB trend charts                          |
+| `/chat`              | AI chat about the player's stats (SSE streaming)                |
+| `/notifications`     | Personal bests, stats-ready, coach notes, weekly summary        |
+| `/settings`          | Account + sign out                                              |
 
 Unknown paths redirect to `/`.
 

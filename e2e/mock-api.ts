@@ -41,7 +41,8 @@ export async function mockApi(page: Page, chatReply: string[]): Promise<MockApi>
     if (key === 'POST /api/chat') {
       api.chatRequests.push(request.postDataJSON());
       const body =
-        chatReply.map((text) => `data: ${JSON.stringify({ text })}\n\n`).join('') + 'data: [DONE]\n\n';
+        chatReply.map((text) => `data: ${JSON.stringify({ text })}\n\n`).join('') +
+        'data: [DONE]\n\n';
       return route.fulfill({ status: 200, contentType: 'text/event-stream', body });
     }
 

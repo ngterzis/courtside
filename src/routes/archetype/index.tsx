@@ -11,7 +11,9 @@ export default function ArchetypeRoute() {
 
   const radarData = useMemo(() => {
     const rankMap = Object.fromEntries((teamRanks ?? []).map((r) => [r.stat, r.percentile]));
-    const receiptMap = Object.fromEntries((archetype?.receipt ?? []).map((r) => [r.stat, r.percentile]));
+    const receiptMap = Object.fromEntries(
+      (archetype?.receipt ?? []).map((r) => [r.stat, r.percentile]),
+    );
     return [
       { axis: 'AST', value: rankMap['assists'] ?? receiptMap['AST/g'] ?? 50 },
       { axis: 'STL', value: rankMap['steals'] ?? 50 },

@@ -16,12 +16,8 @@ export function StatCard({ label, value, delta, accent, className }: Props) {
         className,
       )}
     >
-      <div className="text-[10px] font-semibold uppercase tracking-wider text-ink-70">
-        {label}
-      </div>
-      <div className="mt-1 text-2xl font-bold leading-tight tabular lg:text-3xl">
-        {value}
-      </div>
+      <div className="text-[10px] font-semibold uppercase tracking-wider text-ink-70">{label}</div>
+      <div className="mt-1 text-2xl font-bold leading-tight tabular lg:text-3xl">{value}</div>
       {delta && (
         <div
           className={cn(

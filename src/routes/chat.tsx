@@ -21,10 +21,7 @@ interface ChatMessage {
 const SUGGESTED: Array<{ group: string; questions: string[] }> = [
   {
     group: 'Based on your last game',
-    questions: [
-      'How did I rack up 7 assists vs the Ravens?',
-      'Why was that a personal best?',
-    ],
+    questions: ['How did I rack up 7 assists vs the Ravens?', 'Why was that a personal best?'],
   },
   {
     group: 'About your season',
@@ -173,8 +170,7 @@ export default function ChatRoute() {
             /* ── Empty state: greeting + suggested questions ── */
             <>
               <div className="max-w-[82%] rounded-2xl rounded-tl-sm border border-ink/10 bg-card p-3 text-sm shadow-card">
-                Hey {firstName} 👋 — ask me anything about your{' '}
-                {season?.label ?? 'season'} numbers.
+                Hey {firstName} 👋 — ask me anything about your {season?.label ?? 'season'} numbers.
               </div>
 
               {SUGGESTED.map(({ group, questions }) => (
@@ -218,11 +214,15 @@ export default function ChatRoute() {
                       remarkPlugins={[remarkGfm]}
                       components={{
                         p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
-                        strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                        strong: ({ children }) => (
+                          <strong className="font-semibold">{children}</strong>
+                        ),
                         h2: ({ children }) => <p className="mb-1 font-bold">{children}</p>,
                         h3: ({ children }) => <p className="mb-1 font-semibold">{children}</p>,
                         ul: ({ children }) => <ul className="mb-2 list-disc pl-4">{children}</ul>,
-                        ol: ({ children }) => <ol className="mb-2 list-decimal pl-4">{children}</ol>,
+                        ol: ({ children }) => (
+                          <ol className="mb-2 list-decimal pl-4">{children}</ol>
+                        ),
                         li: ({ children }) => <li className="mb-0.5">{children}</li>,
                         table: ({ children }) => (
                           <div className="my-2 overflow-x-auto">

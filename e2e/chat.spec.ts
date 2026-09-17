@@ -27,7 +27,9 @@ test('player signs in, lands on the dashboard, and asks the agent a question', a
   await page.getByRole('button', { name: 'How has my shooting improved?' }).click();
 
   // The streamed chunks are joined into one rendered markdown reply
-  const reply = page.getByText('You averaged 5.0 assists this season, up from 3 in your first game.');
+  const reply = page.getByText(
+    'You averaged 5.0 assists this season, up from 3 in your first game.',
+  );
   await expect(reply).toBeVisible();
   await expect(reply.locator('strong')).toHaveText('5.0 assists');
 
