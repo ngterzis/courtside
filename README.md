@@ -19,15 +19,17 @@ about their own game.
 | Framework | React 18 + TypeScript |
 | Routing | React Router v6 |
 | Server state | TanStack Query v5 |
-| UI state | Zustand |
 | Styling | Tailwind CSS v3 |
 | Primitives | shadcn/ui style (Radix Slot + CVA), copy-paste not a lib |
 | Charts | Recharts |
 | Icons | Lucide |
+| Linting & formatting | ESLint (typescript-eslint, react-hooks) + Prettier |
 | Unit & component tests | Vitest + React Testing Library |
 | End-to-end tests | Playwright |
 
 ## Getting started
+
+Requires Node 22 or later (`.nvmrc` is provided, so `nvm use` picks it up).
 
 ```bash
 npm install
@@ -36,7 +38,7 @@ npm run dev        # start Vite dev server on http://localhost:5173
 
 The dev server proxies `/api/*` to `http://localhost:8000` (see `vite.config.ts`), so run
 your backend there. The full API contract the frontend expects lives in
-[`BACKEND.md`](./BACKEND.md) — it's the single source of truth for endpoints and JSON shapes.
+[`BACKEND.md`](./docs/BACKEND.md) — it's the single source of truth for endpoints and JSON shapes.
 
 ### Commands
 
@@ -44,6 +46,8 @@ your backend there. The full API contract the frontend expects lives in
 npm run dev        # start Vite dev server
 npm run build      # tsc -b && vite build
 npm run typecheck  # tsc -b --noEmit
+npm run lint       # ESLint
+npm run format     # Prettier (format:check to verify only)
 npm run preview    # preview production build
 npm test           # unit + component tests (Vitest)
 npm run test:watch # Vitest in watch mode
@@ -69,7 +73,7 @@ checked by eye.
 
 First-time E2E setup: `npx playwright install chromium`.
 
-**CI** (`.github/workflows/ci.yml`) runs typecheck, unit/component tests and E2E tests on
+**CI** (`.github/workflows/ci.yml`) runs lint, format check, typecheck, unit/component tests and E2E tests on
 every pull request and push to `main`. Deploys only run once CI passes.
 
 ## How it works
@@ -80,7 +84,7 @@ every pull request and push to `main`. Deploys only run once CI passes.
   logged-in users away from `/login`, and `RequireOnboarded` sends players with no
   `onboardedAt` to `/onboarding`.
 - **Data** — every screen pulls from typed query hooks in `src/lib/queries.ts`
-  (`useMe`, `useArchetype`, `useGames`, `useSeasonAverages`, `useTeamRanks`, `useTrend`, …).
+  (`useMe`, `useArchetype`, `useGames`, `useSeasonAverages`, `useTeamRanks`, `useLastGame`, …).
   The backend is authoritative for derived stats; `src/lib/stats.ts` is the client-side
   fallback when a field is absent.
 - **Chat** — `/chat` streams responses over SSE from `POST /api/chat`
@@ -141,10 +145,12 @@ src/
 │
 ├── mocks/fixtures.ts         # sample data for local dev and E2E API stubs
 ├── test/                     # Vitest setup + stream helpers
-├── stores/ui-store.ts        # Zustand: activeSeasonId, chatOpen
 └── types/index.ts            # Player, Season, Game, GameStats, Archetype, …
 
 e2e/                          # Playwright specs + API stubs
+docs/
+├── BACKEND.md                # API contract the frontend expects
+└── design-handoff/           # product spec + wireframes
 ```
 
 Unit and component tests sit next to the code they cover (`*.test.ts[x]`).
@@ -164,8 +170,8 @@ Tokens from the design handoff are baked into `tailwind.config.js`:
 
 ## Deployment
 
-Pushes to `main` trigger `.github/workflows/deploy.yml`: run the CI workflow, then build, sync `dist/` to S3
-and invalidate CloudFront (AWS auth via OIDC). Requires the `AWS_FRONTEND_ROLE_ARN`,
+Pushes to `main` trigger `.github/workflows/deploy.yml`: run the CI workflow, then build, sync `dist/` to
+S3 and invalidate CloudFront (AWS auth via OIDC). Requires the `AWS_FRONTEND_ROLE_ARN`,
 `S3_BUCKET`, and `CLOUDFRONT_DISTRIBUTION_ID` repo secrets.
 
 ## Related repos
@@ -173,13 +179,13 @@ and invalidate CloudFront (AWS auth via OIDC). Requires the `AWS_FRONTEND_ROLE_A
 Courtside is split across three repositories:
 
 - **[courtside](https://github.com/ngterzis/courtside)** — this repo; the React + TypeScript frontend.
-- **[courtside-backend](https://github.com/ngterzis/courtside-backend)** — API implementing the [`BACKEND.md`](./BACKEND.md) contract.
+- **[courtside-backend](https://github.com/ngterzis/courtside-backend)** — API implementing the [`BACKEND.md`](./docs/BACKEND.md) contract.
 - **[courtside-infra](https://github.com/ngterzis/courtside-infra)** — infrastructure / deployment (AWS).
 
 ## Related docs
 
-- [`BACKEND.md`](./BACKEND.md) — API contract, data models, auth, chat SSE format.
-- [`design_handoff/README.md`](./design_handoff/README.md) — product spec and wireframes.
+- [`docs/BACKEND.md`](./docs/BACKEND.md) — API contract, data models, auth, chat SSE format.
+- [`docs/design-handoff/README.md`](./docs/design-handoff/README.md) — product spec and wireframes.
 
 ## License
 

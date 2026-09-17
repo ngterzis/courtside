@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { fgPct, fmt1, ftPct, pct, threePct, tsPct } from './stats';
 import type { GameStats } from '@/types';
+import { MOCK_GAMES, MOCK_SEASON_AVERAGES } from '@/mocks/fixtures';
 
 const line = (overrides: Partial<GameStats> = {}): GameStats => ({
   points: 0,
@@ -50,6 +51,13 @@ describe('tsPct', () => {
 
   it('returns 0 when the player took no shots', () => {
     expect(tsPct(line())).toBe(0);
+  });
+
+  it('agrees with the precomputed values in the mock data', () => {
+    for (const { id, stats } of MOCK_GAMES) {
+      expect(tsPct(stats), `game ${id}`).toBeCloseTo(stats.tsPct!, 3);
+    }
+    expect(tsPct(MOCK_SEASON_AVERAGES)).toBeCloseTo(MOCK_SEASON_AVERAGES.tsPct!, 2);
   });
 });
 
