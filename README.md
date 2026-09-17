@@ -1,5 +1,7 @@
 # Courtside
 
+[![CI](https://github.com/ngterzis/courtside/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ngterzis/courtside/actions/workflows/ci.yml)
+
 Player-facing web app for a rec-league basketball league. Players sign in, check their
 stats, understand their AI-assigned **archetype** (Playmaker, Efficient Scorer, Glass
 Cleaner, …), track progress across a season, browse their game log, and chat with an AI
@@ -22,6 +24,8 @@ about their own game.
 | Primitives | shadcn/ui style (Radix Slot + CVA), copy-paste not a lib |
 | Charts | Recharts |
 | Icons | Lucide |
+| Unit & component tests | Vitest + React Testing Library |
+| End-to-end tests | Playwright |
 
 ## Getting started
 
@@ -41,7 +45,32 @@ npm run dev        # start Vite dev server
 npm run build      # tsc -b && vite build
 npm run typecheck  # tsc -b --noEmit
 npm run preview    # preview production build
+npm test           # unit + component tests (Vitest)
+npm run test:watch # Vitest in watch mode
+npm run test:e2e   # end-to-end tests (Playwright; builds the app first)
 ```
+
+## Testing
+
+Tests focus on the logic most likely to break silently, not on layout:
+
+| Layer | What's covered | Where |
+|---|---|---|
+| Unit | SSE stream parsing: events split across network reads, multi-byte characters split mid-byte, `[DONE]`, malformed events, reader cleanup | `src/lib/sse.test.ts` |
+| Unit | Shooting percentages and True Shooting % formulas, including zero-attempt edge cases | `src/lib/stats.test.ts` |
+| Unit | `apiFetch`: bearer token, 401 → sign out + redirect, error messages | `src/lib/api.test.ts` |
+| Component | Chat: thinking indicator, incremental streaming into rendered markdown, conversation history sent to the API, error and empty-reply states | `src/routes/chat.test.tsx` |
+| End-to-end | Sign in → dashboard → ask the chat agent a question → follow-up, on desktop and mobile viewports | `e2e/chat.spec.ts` |
+
+The E2E suite runs against the production build with the API stubbed from
+`src/mocks/fixtures.ts` (`e2e/mock-api.ts`), so it needs no backend. Charts and purely
+visual components are deliberately left untested: they change often and are better
+checked by eye.
+
+First-time E2E setup: `npx playwright install chromium`.
+
+**CI** (`.github/workflows/ci.yml`) runs typecheck, unit/component tests and E2E tests on
+every pull request and push to `main`. Deploys only run once CI passes.
 
 ## How it works
 
@@ -55,7 +84,7 @@ npm run preview    # preview production build
   The backend is authoritative for derived stats; `src/lib/stats.ts` is the client-side
   fallback when a field is absent.
 - **Chat** — `/chat` streams responses over SSE from `POST /api/chat`
-  (`src/routes/chat.tsx`).
+  (`src/routes/chat.tsx`, parser in `src/lib/sse.ts`).
 
 ## Routes
 
@@ -106,13 +135,19 @@ src/
 │   ├── api.ts                # apiFetch — Bearer auth, 401 handling, ApiError
 │   ├── auth.ts               # token get/set/clear in localStorage
 │   ├── queries.ts            # typed TanStack Query hooks (one per endpoint)
+│   ├── sse.ts                # readSSE — parses the chat event stream
 │   ├── stats.ts              # fgPct / threePct / ftPct / tsPct fallbacks
 │   └── utils.ts              # cn() — clsx + tailwind-merge
 │
-├── mocks/fixtures.ts         # sample data for local dev
+├── mocks/fixtures.ts         # sample data for local dev and E2E API stubs
+├── test/                     # Vitest setup + stream helpers
 ├── stores/ui-store.ts        # Zustand: activeSeasonId, chatOpen
 └── types/index.ts            # Player, Season, Game, GameStats, Archetype, …
+
+e2e/                          # Playwright specs + API stubs
 ```
+
+Unit and component tests sit next to the code they cover (`*.test.ts[x]`).
 
 ## Design tokens
 
@@ -129,7 +164,7 @@ Tokens from the design handoff are baked into `tailwind.config.js`:
 
 ## Deployment
 
-Pushes to `main` trigger `.github/workflows/deploy.yml`: build, then sync `dist/` to S3
+Pushes to `main` trigger `.github/workflows/deploy.yml`: run the CI workflow, then build, sync `dist/` to S3
 and invalidate CloudFront (AWS auth via OIDC). Requires the `AWS_FRONTEND_ROLE_ARN`,
 `S3_BUCKET`, and `CLOUDFRONT_DISTRIBUTION_ID` repo secrets.
 
