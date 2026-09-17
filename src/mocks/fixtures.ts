@@ -4,8 +4,8 @@ import type {
   Player,
   Season,
   SeasonAverages,
+  Notification,
   TeamRank,
-  TrendPoint,
 } from '@/types';
 
 export const MOCK_PLAYER: Player = {
@@ -363,23 +363,36 @@ export const MOCK_TEAM_RANKS: TeamRank[] = [
   { stat: 'threePct', percentile: 38, label: 'below avg' },
 ];
 
-export const astTrend: TrendPoint[] = MOCK_GAMES.map((g) => ({
-  date: g.date,
-  value: g.stats.assists,
-  gameId: g.id,
-  opponent: g.opponent,
-}));
+const hoursAgo = (h: number) => new Date(Date.now() - h * 3_600_000).toISOString();
 
-export const tovTrend: TrendPoint[] = MOCK_GAMES.map((g) => ({
-  date: g.date,
-  value: g.stats.turnovers,
-  gameId: g.id,
-  opponent: g.opponent,
-}));
-
-export const ptsTrend: TrendPoint[] = MOCK_GAMES.map((g) => ({
-  date: g.date,
-  value: g.stats.points,
-  gameId: g.id,
-  opponent: g.opponent,
-}));
+// Relative timestamps so the notifications page always reads "2h ago", not "5 months ago"
+export const MOCK_NOTIFICATIONS: Notification[] = [
+  {
+    id: 'n1',
+    type: 'personal_best',
+    payload: { message: 'New career high: 22 points and 7 assists vs the Ravens.' },
+    createdAt: hoursAgo(2),
+    readAt: null,
+  },
+  {
+    id: 'n2',
+    type: 'coach_note',
+    payload: { message: 'Coach Mel left a note on your game vs the Ravens.' },
+    createdAt: hoursAgo(20),
+    readAt: null,
+  },
+  {
+    id: 'n3',
+    type: 'stats_ready',
+    payload: { message: 'Stats from your game vs the Ravens are in.' },
+    createdAt: hoursAgo(26),
+    readAt: hoursAgo(25),
+  },
+  {
+    id: 'n4',
+    type: 'weekly_summary',
+    payload: { message: 'You averaged 6.0 assists over your last three games, up from 4.4.' },
+    createdAt: hoursAgo(24 * 6),
+    readAt: hoursAgo(24 * 5),
+  },
+];

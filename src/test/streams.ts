@@ -1,3 +1,5 @@
+export { SSE_DONE, sseEvent } from '@/mocks/api';
+
 const encoder = new TextEncoder();
 
 // Builds a ReadableStream that delivers each chunk as a separate read(),
@@ -12,6 +14,3 @@ export function streamFrom(chunks: Array<string | Uint8Array>): ReadableStream<U
     },
   });
 }
-
-export const sseEvent = (text: string) => `data: ${JSON.stringify({ text })}\n\n`;
-export const SSE_DONE = 'data: [DONE]\n\n';
