@@ -11,8 +11,14 @@ export default defineConfig({
     trace: 'retain-on-failure',
   },
   projects: [
-    { name: 'desktop', use: { ...devices['Desktop Chrome'] } },
-    { name: 'mobile', use: { ...devices['Pixel 7'] } },
+    { name: 'desktop', use: { ...devices['Desktop Chrome'] }, testIgnore: 'screenshots.spec.ts' },
+    { name: 'mobile', use: { ...devices['Pixel 7'] }, testIgnore: 'screenshots.spec.ts' },
+    // Run explicitly with `npm run screenshots`
+    {
+      name: 'screenshots',
+      use: { ...devices['Desktop Chrome'] },
+      testMatch: 'screenshots.spec.ts',
+    },
   ],
   // Runs against the production build; the API is stubbed per test (see e2e/mock-api.ts)
   webServer: {

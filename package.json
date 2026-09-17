@@ -18,7 +18,8 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test --project=desktop --project=mobile",
+    "screenshots": "playwright test --project=screenshots"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.1.1",
