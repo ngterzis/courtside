@@ -32,8 +32,7 @@ interface StatCellProps {
 }
 
 function StatCell({ label, value, sub, isPb, size = 'md' }: StatCellProps) {
-  const valueSize =
-    size === 'lg' ? 'text-4xl' : size === 'sm' ? 'text-lg' : 'text-2xl';
+  const valueSize = size === 'lg' ? 'text-4xl' : size === 'sm' ? 'text-lg' : 'text-2xl';
 
   return (
     <div
@@ -41,13 +40,13 @@ function StatCell({ label, value, sub, isPb, size = 'md' }: StatCellProps) {
         isPb ? 'border-accent/30 bg-accent/5' : 'border-ink/10 bg-card'
       }`}
     >
-      <div className={`flex items-center gap-1 font-bold leading-none tabular ${valueSize} ${isPb ? 'text-accent' : ''}`}>
+      <div
+        className={`flex items-center gap-1 font-bold leading-none tabular ${valueSize} ${isPb ? 'text-accent' : ''}`}
+      >
         {value}
         {isPb && <Star className="h-3.5 w-3.5 flex-shrink-0 fill-accent text-accent" />}
       </div>
-      {sub && (
-        <div className="mt-0.5 font-mono text-[10px] text-ink-50">{sub}</div>
-      )}
+      {sub && <div className="mt-0.5 font-mono text-[10px] text-ink-50">{sub}</div>}
       <div className="mt-1.5 text-[10px] font-semibold uppercase tracking-wider text-ink-70">
         {label}
       </div>
@@ -65,14 +64,16 @@ interface ShootingRowProps {
 
 function ShootingRow({ label, made, attempted, pctValue, isPb }: ShootingRowProps) {
   return (
-    <div className={`rounded-md border px-4 py-3 ${isPb ? 'border-accent/30 bg-accent/5' : 'border-ink/10 bg-card'}`}>
+    <div
+      className={`rounded-md border px-4 py-3 ${isPb ? 'border-accent/30 bg-accent/5' : 'border-ink/10 bg-card'}`}
+    >
       <div className="flex items-center justify-between">
-        <span className="text-[11px] font-semibold uppercase tracking-wider text-ink-70">{label}</span>
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-ink-70">
+          {label}
+        </span>
         <div className="flex items-center gap-1.5">
           {isPb && <Star className="h-3 w-3 fill-accent text-accent" />}
-          <span className={`font-bold tabular ${isPb ? 'text-accent' : ''}`}>
-            {pct(pctValue)}
-          </span>
+          <span className={`font-bold tabular ${isPb ? 'text-accent' : ''}`}>{pct(pctValue)}</span>
         </div>
       </div>
       <div className="mt-1.5 flex items-center gap-2">
@@ -184,22 +185,9 @@ export default function GameDetailRoute() {
             </div>
             {/* PTS hero + REB/AST */}
             <div className="mb-2 grid grid-cols-3 gap-2">
-              <StatCell
-                label="PTS"
-                value={stats.points}
-                isPb={isPb('points')}
-                size="lg"
-              />
-              <StatCell
-                label="REB"
-                value={stats.rebounds}
-                isPb={isPb('rebounds')}
-              />
-              <StatCell
-                label="AST"
-                value={stats.assists}
-                isPb={isPb('assists')}
-              />
+              <StatCell label="PTS" value={stats.points} isPb={isPb('points')} size="lg" />
+              <StatCell label="REB" value={stats.rebounds} isPb={isPb('rebounds')} />
+              <StatCell label="AST" value={stats.assists} isPb={isPb('assists')} />
             </div>
             {/* Secondary stats */}
             <div className="grid grid-cols-4 gap-2">
@@ -260,7 +248,9 @@ export default function GameDetailRoute() {
                     Points scored per shooting opportunity
                   </div>
                 </div>
-                <div className={`flex items-center gap-1.5 text-3xl font-bold tabular ${isPb('tsPct') ? 'text-accent' : ''}`}>
+                <div
+                  className={`flex items-center gap-1.5 text-3xl font-bold tabular ${isPb('tsPct') ? 'text-accent' : ''}`}
+                >
                   {pct(gameTsPct)}
                   {isPb('tsPct') && <Star className="h-5 w-5 fill-accent text-accent" />}
                 </div>

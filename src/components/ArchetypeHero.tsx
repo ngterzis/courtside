@@ -27,7 +27,7 @@ export function ArchetypeHero({ archetype, variant = 'compact', className }: Pro
         className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-white/10"
       />
       <div className="relative">
-        <div className="text-xs uppercase tracking-wider text-white/70">You are a</div>
+        <div className="text-xs uppercase tracking-wider text-white/90">You are a</div>
         <div
           className={cn(
             'font-bold leading-none tracking-tight',
@@ -36,18 +36,23 @@ export function ArchetypeHero({ archetype, variant = 'compact', className }: Pro
         >
           {archetype.primary}
         </div>
-        <div className={cn('text-white/80', full ? 'mt-2 text-lg' : 'mt-1 text-sm')}>
+        <div className={cn('text-white/90', full ? 'mt-2 text-lg' : 'mt-1 text-sm')}>
           / {archetype.secondary}
         </div>
 
         <hr className="my-4 border-t border-dashed border-white/25" />
 
-        <p className={cn('text-white/90', full ? 'text-base leading-relaxed' : 'text-sm leading-relaxed')}>
+        <p
+          className={cn(
+            'text-white/90',
+            full ? 'text-base leading-relaxed' : 'text-sm leading-relaxed',
+          )}
+        >
           {archetype.explanation}
         </p>
 
         <div className="mt-4 flex items-center justify-between">
-          <div className="text-[10px] font-mono uppercase tracking-wider text-white/60">
+          <div className="text-[10px] font-mono uppercase tracking-wider text-white/90">
             AI-generated · updated today
           </div>
           <div className="flex items-center gap-1 text-sm font-semibold opacity-90 transition-opacity group-hover:opacity-100">

@@ -24,22 +24,44 @@ export default function TrendsRoute() {
 
   const filtered = useMemo(() => {
     switch (range) {
-      case 'last5': return games.slice(-5);
-      default:      return games;
+      case 'last5':
+        return games.slice(-5);
+      default:
+        return games;
     }
   }, [games, range]);
 
-  const ptsTrend  = filtered.map((g): TrendPoint => ({ date: g.date, value: g.stats.points,    opponent: g.opponent }));
-  const tsTrend   = filtered.map((g): TrendPoint => ({ date: g.date, value: Math.round((g.stats.tsPct ?? computeTS(g.stats)) * 100), opponent: g.opponent }));
-  const astTrend  = filtered.map((g): TrendPoint => ({ date: g.date, value: g.stats.assists,   opponent: g.opponent }));
-  const rebTrend  = filtered.map((g): TrendPoint => ({ date: g.date, value: g.stats.rebounds,  opponent: g.opponent }));
-  const tovTrend  = filtered.map((g): TrendPoint => ({ date: g.date, value: g.stats.turnovers, opponent: g.opponent }));
+  const ptsTrend = filtered.map((g): TrendPoint => ({
+    date: g.date,
+    value: g.stats.points,
+    opponent: g.opponent,
+  }));
+  const tsTrend = filtered.map((g): TrendPoint => ({
+    date: g.date,
+    value: Math.round((g.stats.tsPct ?? computeTS(g.stats)) * 100),
+    opponent: g.opponent,
+  }));
+  const astTrend = filtered.map((g): TrendPoint => ({
+    date: g.date,
+    value: g.stats.assists,
+    opponent: g.opponent,
+  }));
+  const rebTrend = filtered.map((g): TrendPoint => ({
+    date: g.date,
+    value: g.stats.rebounds,
+    opponent: g.opponent,
+  }));
+  const tovTrend = filtered.map((g): TrendPoint => ({
+    date: g.date,
+    value: g.stats.turnovers,
+    opponent: g.opponent,
+  }));
 
   const charts: Array<{ key: string; label: string; data: TrendPoint[]; unit?: string }> = [
-    { key: 'PTS',  label: 'Points',            data: ptsTrend  },
-    { key: 'TS%',  label: 'True Shooting %',   data: tsTrend, unit: '%' },
-    { key: 'AST',  label: 'Assists',            data: astTrend  },
-    { key: 'REB',  label: 'Rebounds',           data: rebTrend  },
+    { key: 'PTS', label: 'Points', data: ptsTrend },
+    { key: 'TS%', label: 'True Shooting %', data: tsTrend, unit: '%' },
+    { key: 'AST', label: 'Assists', data: astTrend },
+    { key: 'REB', label: 'Rebounds', data: rebTrend },
   ];
 
   if (isLoading) {

@@ -25,14 +25,11 @@ function movingAverage(values: number[], window: number): Array<number | null> {
   });
 }
 
-export function TrendChart({
-  data,
-  label,
-  rollingAvg = true,
-  accent = true,
-  height = 160,
-}: Props) {
-  const avg = movingAverage(data.map((d) => d.value), 3);
+export function TrendChart({ data, label, rollingAvg = true, accent = true, height = 160 }: Props) {
+  const avg = movingAverage(
+    data.map((d) => d.value),
+    3,
+  );
   const rows = data.map((p, i) => ({
     date: p.date.slice(5),
     opponent: p.opponent,
