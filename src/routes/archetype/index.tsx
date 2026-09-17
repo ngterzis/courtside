@@ -72,16 +72,16 @@ export default function ArchetypeRoute() {
 
         <div className="relative">
           <div className="mb-1 flex items-center justify-between">
-            <span className="text-[10px] font-semibold uppercase tracking-widest text-white/60">
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-white/90">
               Primary
             </span>
-            <span className="font-mono text-[10px] text-white/50">{jerseyLabel}</span>
+            <span className="font-mono text-[10px] text-white/90">{jerseyLabel}</span>
           </div>
 
           <div className="text-4xl font-extrabold leading-none tracking-tight lg:text-5xl">
             {archetype.primary}
           </div>
-          <div className="mt-1 text-sm text-white/75 lg:text-base">+ {archetype.secondary}</div>
+          <div className="mt-1 text-sm text-white/90 lg:text-base">+ {archetype.secondary}</div>
 
           <hr className="my-4 border-t border-dashed border-white/25" />
 
@@ -90,7 +90,7 @@ export default function ArchetypeRoute() {
           </p>
 
           <div className="mt-4 flex items-center justify-between">
-            <span className="font-mono text-[10px] uppercase tracking-wider text-white/50">
+            <span className="font-mono text-[10px] uppercase tracking-wider text-white/90">
               AI-generated · updated today
             </span>
           </div>
@@ -168,7 +168,7 @@ export default function ArchetypeRoute() {
           <hr className="my-1.5 border-dashed border-ink/15" />
           <div className="flex justify-between font-bold">
             <span>{archetype.primary.toUpperCase()}</span>
-            <span style={{ color: '#d7622c' }}>
+            <span className="text-accent">
               {archetype.scores?.find((s) => s.isPrimary)?.score ?? ''} ★
             </span>
           </div>
@@ -181,8 +181,7 @@ export default function ArchetypeRoute() {
         <div className="mt-4 flex gap-3">
           <Link
             to="/chat"
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2.5 text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
-            style={{ background: '#d7622c' }}
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-accent py-2.5 text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
           >
             <MessageSquare className="h-3.5 w-3.5" />
             Ask AI why

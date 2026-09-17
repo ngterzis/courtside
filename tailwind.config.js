@@ -14,21 +14,22 @@ export default {
     },
     extend: {
       colors: {
-        // Courtside palette (tokens.ts)
+        // Courtside palette (tokens.ts). Primary and accent are darkened slightly from the
+        // design handoff so text meets WCAG AA; charts keep the original hues (see components)
         primary: {
-          DEFAULT: '#974ca8',
+          DEFAULT: '#934aa4',
           soft: '#f0e3f3',
           foreground: '#ffffff',
         },
         accent: {
-          DEFAULT: '#d7622c',
+          DEFAULT: '#a94d23',
           soft: '#fbe3d3',
           foreground: '#ffffff',
         },
         ink: {
           DEFAULT: '#1b1a17',
           70: 'rgba(27,26,23,0.72)',
-          50: 'rgba(27,26,23,0.5)',
+          50: 'rgba(27,26,23,0.62)', // 0.62 keeps small text at WCAG AA contrast
           30: 'rgba(27,26,23,0.3)',
           15: 'rgba(27,26,23,0.15)',
         },
@@ -40,7 +41,7 @@ export default {
         danger: '#c03a3a',
         border: 'rgba(27,26,23,0.15)',
         input: 'rgba(27,26,23,0.15)',
-        ring: '#974ca8',
+        ring: '#934aa4',
         background: '#fbfaf6',
         foreground: '#1b1a17',
         muted: {
