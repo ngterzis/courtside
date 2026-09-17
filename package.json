@@ -2,6 +2,13 @@
   "name": "courtside",
   "private": true,
   "version": "0.0.1",
+  "description": "Player-facing web app for a rec-league basketball league: stats, AI-assigned archetypes and a streaming AI chat",
+  "license": "AGPL-3.0-only",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ngterzis/courtside.git"
+  },
+  "homepage": "https://github.com/ngterzis/courtside#readme",
   "type": "module",
   "engines": {
     "node": ">=22"
