@@ -6,11 +6,25 @@ updates:
       interval: weekly
     open-pull-requests-limit: 5
     groups:
-      # One PR per week for routine updates instead of one per package
-      minor-and-patch:
+      # Build and test tooling shares peer dependencies (vite/vitest,
+      # eslint/typescript-eslint), so majors only install if they move together.
+      dev-tooling:
+        dependency-type: development
+        update-types: [major, minor, patch]
+      # Runtime deps: routine updates in one PR, majors on their own.
+      runtime:
+        dependency-type: production
         update-types: [minor, patch]
+    ignore:
+      # tailwind-merge v3+ requires Tailwind CSS v4; revisit when we upgrade Tailwind.
+      - dependency-name: tailwind-merge
+        update-types: [version-update:semver-major]
 
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: monthly
+    groups:
+      # Action majors are usually just a runner Node bump; one PR a month is enough.
+      actions:
+        update-types: [major, minor, patch]
