@@ -45,10 +45,7 @@ function renderChat() {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   render(
     <QueryClientProvider client={queryClient}>
-      <MemoryRouter
-        initialEntries={['/chat']}
-        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
-      >
+      <MemoryRouter initialEntries={['/chat']}>
         <ChatRoute />
       </MemoryRouter>
     </QueryClientProvider>,
