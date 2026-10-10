@@ -33,11 +33,7 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
   const body = await res.json().catch(() => null);
 
   if (!res.ok) {
-    throw new ApiError(
-      (body as { message?: string })?.message ?? res.statusText,
-      res.status,
-      body,
-    );
+    throw new ApiError((body as { message?: string })?.message ?? res.statusText, res.status, body);
   }
 
   return body as T;

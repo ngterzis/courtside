@@ -55,14 +55,11 @@ function NotificationRow({ notif, onRead }: { notif: Notification; onRead: (id: 
         </div>
         {notif.payload && Object.keys(notif.payload).length > 0 && (
           <p className="mt-0.5 text-[12px] text-ink-70">
-            {(notif.payload as { message?: string }).message ??
-              JSON.stringify(notif.payload)}
+            {(notif.payload as { message?: string }).message ?? JSON.stringify(notif.payload)}
           </p>
         )}
       </div>
-      {unread && (
-        <div className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-primary" />
-      )}
+      {unread && <div className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-primary" />}
     </div>
   );
 }
@@ -72,8 +69,7 @@ export default function NotificationsRoute() {
   const { data: notifications, isLoading } = useNotifications();
 
   const markRead = useMutation({
-    mutationFn: (id: string) =>
-      apiFetch(`/api/me/notifications/${id}/read`, { method: 'POST' }),
+    mutationFn: (id: string) => apiFetch(`/api/me/notifications/${id}/read`, { method: 'POST' }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
     },
@@ -100,9 +96,7 @@ export default function NotificationsRoute() {
       <div className="mb-5 lg:mb-6">
         <h1 className="text-xl font-bold tracking-tight lg:text-2xl">Notifications</h1>
         {unreadCount > 0 && (
-          <p className="mt-0.5 text-sm text-ink-70">
-            {unreadCount} unread — tap to dismiss
-          </p>
+          <p className="mt-0.5 text-sm text-ink-70">{unreadCount} unread — tap to dismiss</p>
         )}
       </div>
 
@@ -113,11 +107,7 @@ export default function NotificationsRoute() {
       ) : (
         <div className="space-y-2.5">
           {items.map((n) => (
-            <NotificationRow
-              key={n.id}
-              notif={n}
-              onRead={(id) => markRead.mutate(id)}
-            />
+            <NotificationRow key={n.id} notif={n} onRead={(id) => markRead.mutate(id)} />
           ))}
         </div>
       )}

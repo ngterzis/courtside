@@ -18,6 +18,7 @@ All `/api/me/*` and `/api/games/*` endpoints require a valid token.
 Return `401` when the token is missing, expired, or invalid — the frontend redirects to `/login`.
 
 **JWT payload:**
+
 ```json
 { "sub": "<playerId>", "iat": 1234567890, "exp": 1234567890 }
 ```
@@ -243,11 +244,12 @@ for the given season. Return a `TeamRank` entry for at least: `assists`, `reboun
 profile section.
 
 Percentile labels:
+
 - 90–100 → "#1 on team" (or "#2 on team" if not top)
-- 70–89  → "top 3"
-- 50–69  → "above avg"
-- 30–49  → "below avg"
-- 0–29   → "bottom 3"
+- 70–89 → "top 3"
+- 50–69 → "above avg"
+- 30–49 → "below avg"
+- 0–29 → "bottom 3"
 
 ---
 
@@ -303,11 +305,13 @@ POST /api/chat
 ### SSE format
 
 Each token chunk:
+
 ```
 data: {"text":"<token>"}\n\n
 ```
 
 Terminator:
+
 ```
 data: [DONE]\n\n
 ```
@@ -382,6 +386,7 @@ Notification {
 ```
 
 Notifications are created server-side by background jobs:
+
 - `personal_best` — when a new game is saved and a stat exceeds the player's prior season high
 - `stats_ready` — when a new game is saved for this player
 - `archetype_changed` — when the archetype assignment changes vs previous
@@ -395,18 +400,18 @@ Notifications are created server-side by background jobs:
 When a new game is saved for a player, invalidate these on the client by pushing
 a `stats_ready` notification. The frontend re-fetches on notification receipt.
 
-| Endpoint | Query key |
-|---|---|
-| GET /api/me | `['me']` |
-| GET /api/seasons | `['seasons']` |
-| GET /api/seasons/current | `['seasons', 'current']` |
-| GET /api/me/archetype | `['archetype', seasonId]` |
-| GET /api/me/archetype/history | `['archetype', 'history']` |
-| GET /api/me/games | `['games', { seasonId }]` |
-| GET /api/games/:id | `['game', gameId]` |
-| GET /api/me/season-averages | `['season-averages', seasonId]` |
-| GET /api/me/team-ranks | `['team-ranks', seasonId]` |
-| GET /api/me/notifications | `['notifications']` |
+| Endpoint                      | Query key                       |
+| ----------------------------- | ------------------------------- |
+| GET /api/me                   | `['me']`                        |
+| GET /api/seasons              | `['seasons']`                   |
+| GET /api/seasons/current      | `['seasons', 'current']`        |
+| GET /api/me/archetype         | `['archetype', seasonId]`       |
+| GET /api/me/archetype/history | `['archetype', 'history']`      |
+| GET /api/me/games             | `['games', { seasonId }]`       |
+| GET /api/games/:id            | `['game', gameId]`              |
+| GET /api/me/season-averages   | `['season-averages', seasonId]` |
+| GET /api/me/team-ranks        | `['team-ranks', seasonId]`      |
+| GET /api/me/notifications     | `['notifications']`             |
 
 ---
 
@@ -425,6 +430,7 @@ once a real server handles `/api/chat`.
 ## Error envelope
 
 All error responses:
+
 ```json
 { "error": "<machine_readable_code>", "message": "<human_readable>" }
 ```

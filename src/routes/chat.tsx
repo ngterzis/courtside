@@ -5,6 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useMe, useCurrentSeason } from '@/lib/queries';
 import { getToken } from '@/lib/auth';
+import { readSSE } from '@/lib/sse';
 import { cn } from '@/lib/utils';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -20,10 +21,7 @@ interface ChatMessage {
 const SUGGESTED: Array<{ group: string; questions: string[] }> = [
   {
     group: 'Based on your last game',
-    questions: [
-      'How did I rack up 7 assists vs the Ravens?',
-      'Why was that a personal best?',
-    ],
+    questions: ['How did I rack up 7 assists vs the Ravens?', 'Why was that a personal best?'],
   },
   {
     group: 'About your season',
@@ -40,7 +38,7 @@ const SUGGESTED: Array<{ group: string; questions: string[] }> = [
 
 function ThinkingDots() {
   return (
-    <div className="flex items-center gap-1 px-1 py-0.5">
+    <div role="status" aria-label="Thinking" className="flex items-center gap-1 px-1 py-0.5">
       {[0, 150, 300].map((delay) => (
         <span
           key={delay}
@@ -50,39 +48,6 @@ function ThinkingDots() {
       ))}
     </div>
   );
-}
-
-// ── SSE stream reader ─────────────────────────────────────────────────────────
-
-async function* readSSE(body: ReadableStream<Uint8Array>): AsyncGenerator<string> {
-  const reader = body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = '';
-
-  try {
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      buffer += decoder.decode(value, { stream: true });
-      const parts = buffer.split('\n\n');
-      buffer = parts.pop() ?? '';
-      for (const part of parts) {
-        for (const line of part.split('\n')) {
-          if (!line.startsWith('data: ')) continue;
-          const data = line.slice(6).trim();
-          if (data === '[DONE]') return;
-          try {
-            const parsed = JSON.parse(data) as { text?: string };
-            if (parsed.text) yield parsed.text;
-          } catch {
-            // ignore malformed events
-          }
-        }
-      }
-    }
-  } finally {
-    reader.releaseLock();
-  }
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -141,11 +106,15 @@ export default function ChatRoute() {
 
       if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
 
-      for await (const token of readSSE(res.body)) {
+      let received = false;
+      for await (const chunk of readSSE(res.body)) {
+        received = true;
         setMessages((prev) =>
-          prev.map((m) => (m.id === assistantId ? { ...m, content: m.content + token } : m)),
+          prev.map((m) => (m.id === assistantId ? { ...m, content: m.content + chunk } : m)),
         );
       }
+      // An empty reply would leave the thinking dots up forever
+      if (!received) throw new Error('Empty response');
     } catch {
       setMessages((prev) =>
         prev.map((m) =>
@@ -201,8 +170,7 @@ export default function ChatRoute() {
             /* ── Empty state: greeting + suggested questions ── */
             <>
               <div className="max-w-[82%] rounded-2xl rounded-tl-sm border border-ink/10 bg-card p-3 text-sm shadow-card">
-                Hey {firstName} 👋 — ask me anything about your{' '}
-                {season?.label ?? 'season'} numbers.
+                Hey {firstName} 👋 — ask me anything about your {season?.label ?? 'season'} numbers.
               </div>
 
               {SUGGESTED.map(({ group, questions }) => (
@@ -246,11 +214,15 @@ export default function ChatRoute() {
                       remarkPlugins={[remarkGfm]}
                       components={{
                         p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
-                        strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                        strong: ({ children }) => (
+                          <strong className="font-semibold">{children}</strong>
+                        ),
                         h2: ({ children }) => <p className="mb-1 font-bold">{children}</p>,
                         h3: ({ children }) => <p className="mb-1 font-semibold">{children}</p>,
                         ul: ({ children }) => <ul className="mb-2 list-disc pl-4">{children}</ul>,
-                        ol: ({ children }) => <ol className="mb-2 list-decimal pl-4">{children}</ol>,
+                        ol: ({ children }) => (
+                          <ol className="mb-2 list-decimal pl-4">{children}</ol>
+                        ),
                         li: ({ children }) => <li className="mb-0.5">{children}</li>,
                         table: ({ children }) => (
                           <div className="my-2 overflow-x-auto">

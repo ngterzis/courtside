@@ -44,9 +44,7 @@ export default function OnboardingRoute() {
       </div>
       <p className="mb-6 text-sm text-ink-70">Let's set up your player profile.</p>
       {error && (
-        <div className="mb-3 rounded-md bg-danger/10 px-3 py-2 text-sm text-danger">
-          {error}
-        </div>
+        <div className="mb-3 rounded-md bg-danger/10 px-3 py-2 text-sm text-danger">{error}</div>
       )}
       <form className="space-y-5" onSubmit={handleSubmit}>
         <div>
@@ -86,11 +84,7 @@ export default function OnboardingRoute() {
             ))}
           </div>
         </div>
-        <Button
-          type="submit"
-          className="w-full"
-          disabled={loading || !position || !jerseyNumber}
-        >
+        <Button type="submit" className="w-full" disabled={loading || !position || !jerseyNumber}>
           {loading ? 'Saving…' : 'Get started'}
         </Button>
       </form>

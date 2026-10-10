@@ -32,9 +32,7 @@ export const useArchetype = (seasonId?: string) =>
   useQuery({
     queryKey: ['archetype', seasonId ?? 'current'],
     queryFn: () =>
-      apiFetch<Archetype>(
-        `/api/me/archetype${seasonId ? `?seasonId=${seasonId}` : ''}`,
-      ),
+      apiFetch<Archetype>(`/api/me/archetype${seasonId ? `?seasonId=${seasonId}` : ''}`),
   });
 
 export const useArchetypeHistory = () =>
@@ -47,9 +45,7 @@ export const useSeasonAverages = (seasonId?: string) =>
   useQuery({
     queryKey: ['season-averages', seasonId ?? 'current'],
     queryFn: () =>
-      apiFetch<SeasonAverages>(
-        `/api/me/season-averages${seasonId ? `?seasonId=${seasonId}` : ''}`,
-      ),
+      apiFetch<SeasonAverages>(`/api/me/season-averages${seasonId ? `?seasonId=${seasonId}` : ''}`),
   });
 
 export const useGames = (seasonId?: string) =>
@@ -67,9 +63,7 @@ export const useLastGame = (seasonId?: string) =>
   useQuery({
     queryKey: ['games', 'last', { seasonId: seasonId ?? 'current' }],
     queryFn: () =>
-      apiFetch<Game | null>(
-        `/api/me/games/last${seasonId ? `?seasonId=${seasonId}` : ''}`,
-      ),
+      apiFetch<Game | null>(`/api/me/games/last${seasonId ? `?seasonId=${seasonId}` : ''}`),
   });
 
 export const useGame = (gameId?: string) =>
@@ -83,9 +77,7 @@ export const useTeamRanks = (seasonId?: string) =>
   useQuery({
     queryKey: ['team-ranks', seasonId ?? 'current'],
     queryFn: () =>
-      apiFetch<TeamRank[]>(
-        `/api/me/team-ranks${seasonId ? `?seasonId=${seasonId}` : ''}`,
-      ),
+      apiFetch<TeamRank[]>(`/api/me/team-ranks${seasonId ? `?seasonId=${seasonId}` : ''}`),
   });
 
 export const useNotifications = () =>

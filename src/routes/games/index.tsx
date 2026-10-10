@@ -89,31 +89,40 @@ export default function GamesRoute() {
               key={game.id}
               to={`/games/${game.id}`}
               className={`block rounded-md border p-3 shadow-card transition-opacity hover:opacity-90 ${
-                hasPb
-                  ? 'border-primary/30 bg-primary/5'
-                  : 'border-ink/10 bg-card'
+                hasPb ? 'border-primary/30 bg-primary/5' : 'border-ink/10 bg-card'
               }`}
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <div className="flex items-center gap-1.5 text-sm font-bold">
                     {game.homeAway === 'H' ? 'vs' : '@'} {game.opponent}
-                    {hasPb && <Star className="h-3.5 w-3.5 flex-shrink-0 fill-accent text-accent" />}
+                    {hasPb && (
+                      <Star className="h-3.5 w-3.5 flex-shrink-0 fill-accent text-accent" />
+                    )}
                   </div>
                   <div className="mt-0.5 font-mono text-[10px] text-ink-70">
                     {formatDate(game.date)} · {game.homeAway} ·{' '}
-                    <span className={game.result === 'W' ? 'text-success font-semibold' : 'text-danger font-semibold'}>
+                    <span
+                      className={
+                        game.result === 'W'
+                          ? 'text-success font-semibold'
+                          : 'text-danger font-semibold'
+                      }
+                    >
                       {game.result}
-                    </span>
-                    {' '}
+                    </span>{' '}
                     {game.teamScore}–{game.opponentScore}
                   </div>
                 </div>
                 <div className="flex-shrink-0 text-right">
-                  <div className={`text-2xl font-extrabold leading-none ${hasPb ? 'text-primary' : 'text-ink'}`}>
+                  <div
+                    className={`text-2xl font-extrabold leading-none ${hasPb ? 'text-primary' : 'text-ink'}`}
+                  >
                     {stats.points}
                   </div>
-                  <div className="mt-0.5 text-[9px] font-semibold uppercase tracking-wider text-ink-70">PTS</div>
+                  <div className="mt-0.5 text-[9px] font-semibold uppercase tracking-wider text-ink-70">
+                    PTS
+                  </div>
                 </div>
               </div>
               <div className="mt-2 font-mono text-[11px] text-ink-70">
@@ -149,7 +158,22 @@ export default function GamesRoute() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-ink/15 bg-paper-deep">
-                  {['DATE', 'OPP', 'H/A', 'PTS', 'REB', 'AST', 'STL', 'TOV', 'PF', 'FG%', '3PT%', 'FT%', 'TS%', 'NOTE'].map((h) => (
+                  {[
+                    'DATE',
+                    'OPP',
+                    'H/A',
+                    'PTS',
+                    'REB',
+                    'AST',
+                    'STL',
+                    'TOV',
+                    'PF',
+                    'FG%',
+                    '3PT%',
+                    'FT%',
+                    'TS%',
+                    'NOTE',
+                  ].map((h) => (
                     <th
                       key={h}
                       className="whitespace-nowrap px-3 py-2.5 text-left font-mono text-[10px] font-bold uppercase tracking-wider text-ink-70"
@@ -177,10 +201,14 @@ export default function GamesRoute() {
                       </td>
                       <td className="whitespace-nowrap px-3 py-2.5 text-[11px] font-semibold">
                         {game.homeAway === 'H' ? 'vs' : '@'} {game.opponent}
-                        {hasPb && <Star className="ml-1.5 inline h-3 w-3 fill-accent text-accent" />}
+                        {hasPb && (
+                          <Star className="ml-1.5 inline h-3 w-3 fill-accent text-accent" />
+                        )}
                       </td>
                       <td className="px-3 py-2.5 font-mono text-[11px]">{game.homeAway}</td>
-                      <td className={`px-3 py-2.5 font-mono text-[11px] font-bold ${hasPb ? 'text-primary' : ''}`}>
+                      <td
+                        className={`px-3 py-2.5 font-mono text-[11px] font-bold ${hasPb ? 'text-primary' : ''}`}
+                      >
                         {stats.points}
                       </td>
                       <td className="px-3 py-2.5 font-mono text-[11px]">{stats.rebounds}</td>
@@ -188,10 +216,18 @@ export default function GamesRoute() {
                       <td className="px-3 py-2.5 font-mono text-[11px]">{stats.steals}</td>
                       <td className="px-3 py-2.5 font-mono text-[11px]">{stats.turnovers}</td>
                       <td className="px-3 py-2.5 font-mono text-[11px]">{stats.fouls}</td>
-                      <td className="px-3 py-2.5 font-mono text-[11px]">{pct(stats.fgPct ?? calcFgPct(stats))}</td>
-                      <td className="px-3 py-2.5 font-mono text-[11px]">{pct(stats.threePct ?? calcThreePct(stats))}</td>
-                      <td className="px-3 py-2.5 font-mono text-[11px]">{pct(stats.ftPct ?? calcFtPct(stats))}</td>
-                      <td className={`px-3 py-2.5 font-mono text-[11px] ${hasPb ? 'font-bold text-primary' : ''}`}>
+                      <td className="px-3 py-2.5 font-mono text-[11px]">
+                        {pct(stats.fgPct ?? calcFgPct(stats))}
+                      </td>
+                      <td className="px-3 py-2.5 font-mono text-[11px]">
+                        {pct(stats.threePct ?? calcThreePct(stats))}
+                      </td>
+                      <td className="px-3 py-2.5 font-mono text-[11px]">
+                        {pct(stats.ftPct ?? calcFtPct(stats))}
+                      </td>
+                      <td
+                        className={`px-3 py-2.5 font-mono text-[11px] ${hasPb ? 'font-bold text-primary' : ''}`}
+                      >
                         {pct(stats.tsPct ?? calcTsPct(stats))}
                       </td>
                       <td className="px-3 py-2.5 text-[11px] text-ink-70">

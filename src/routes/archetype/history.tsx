@@ -11,10 +11,7 @@ function seasonLabel(archetype: Archetype, seasons: Season[]): string {
 function PercentileBar({ value }: { value: number }) {
   return (
     <div className="h-1 w-full overflow-hidden rounded-full bg-ink/10">
-      <div
-        className="h-full rounded-full bg-primary"
-        style={{ width: `${value}%` }}
-      />
+      <div className="h-full rounded-full bg-primary" style={{ width: `${value}%` }} />
     </div>
   );
 }
@@ -38,9 +35,7 @@ function ArchetypeCard({ archetype, label }: { archetype: Archetype; label: stri
       </div>
 
       {/* Explanation */}
-      <p className="mb-4 text-sm leading-relaxed text-ink/80 italic">
-        "{archetype.explanation}"
-      </p>
+      <p className="mb-4 text-sm leading-relaxed text-ink/80 italic">"{archetype.explanation}"</p>
 
       {/* Receipt */}
       {archetype.receipt.length > 0 && (
@@ -49,9 +44,7 @@ function ArchetypeCard({ archetype, label }: { archetype: Archetype; label: stri
             <div key={line.stat}>
               <div className="mb-1 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-[11px] font-semibold text-ink">
-                    {line.stat}
-                  </span>
+                  <span className="font-mono text-[11px] font-semibold text-ink">{line.stat}</span>
                   <span className="font-mono text-[11px] text-ink-70">{line.value}</span>
                 </div>
                 <span className="text-[11px] text-ink-50">{line.comment}</span>
@@ -102,12 +95,8 @@ export default function ArchetypeHistoryRoute() {
         <div className="text-[10px] font-semibold uppercase tracking-wider text-ink-70">
           Archetype
         </div>
-        <h1 className="text-xl font-bold tracking-tight lg:text-2xl">
-          Your role evolution
-        </h1>
-        <p className="mt-0.5 text-sm text-ink-70">
-          How your game has evolved across seasons.
-        </p>
+        <h1 className="text-xl font-bold tracking-tight lg:text-2xl">Your role evolution</h1>
+        <p className="mt-0.5 text-sm text-ink-70">How your game has evolved across seasons.</p>
       </div>
 
       {entries.length === 0 ? (
@@ -126,17 +115,12 @@ export default function ArchetypeHistoryRoute() {
                 <div className="hidden lg:flex lg:w-8 lg:flex-shrink-0 lg:flex-col lg:items-center">
                   <div
                     className={`mt-5 h-3 w-3 rounded-full border-2 ${
-                      i === 0
-                        ? 'border-primary bg-primary'
-                        : 'border-ink/30 bg-paper'
+                      i === 0 ? 'border-primary bg-primary' : 'border-ink/30 bg-paper'
                     }`}
                   />
                 </div>
                 <div className="flex-1">
-                  <ArchetypeCard
-                    archetype={archetype}
-                    label={seasonLabel(archetype, seasons)}
-                  />
+                  <ArchetypeCard archetype={archetype} label={seasonLabel(archetype, seasons)} />
                 </div>
               </div>
             ))}
