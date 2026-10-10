@@ -31,6 +31,10 @@ updates:
       # tailwind-merge v3+ requires Tailwind CSS v4; revisit when we upgrade Tailwind.
       - dependency-name: tailwind-merge
         update-types: [version-update:semver-major]
+      # Tailwind v4 is a framework migration (PostCSS plugin moved, CSS-first
+      # config) and pairs with the tailwind-merge major above. Do it deliberately.
+      - dependency-name: tailwindcss
+        update-types: [version-update:semver-major]
       # typescript-eslint doesn't support TypeScript 7 yet, and a lone TS major
       # blocks the whole dev-tooling group. Drop this once it does.
       - dependency-name: typescript
