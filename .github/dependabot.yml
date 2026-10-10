@@ -6,6 +6,18 @@ updates:
       interval: weekly
     open-pull-requests-limit: 5
     groups:
+      # First match wins, so react-* is listed before the dependency-type groups
+      # that would otherwise claim the @types packages.
+      #
+      # react, react-dom and their @types all peer-depend on each other, so a lone
+      # bump can never install. Majors included: they have to move as a set.
+      react:
+        patterns:
+          - react
+          - react-dom
+          - '@types/react'
+          - '@types/react-dom'
+        update-types: [major, minor, patch]
       # Build and test tooling shares peer dependencies (vite/vitest,
       # eslint/typescript-eslint), so majors only install if they move together.
       dev-tooling:
@@ -18,6 +30,10 @@ updates:
     ignore:
       # tailwind-merge v3+ requires Tailwind CSS v4; revisit when we upgrade Tailwind.
       - dependency-name: tailwind-merge
+        update-types: [version-update:semver-major]
+      # typescript-eslint doesn't support TypeScript 7 yet, and a lone TS major
+      # blocks the whole dev-tooling group. Drop this once it does.
+      - dependency-name: typescript
         update-types: [version-update:semver-major]
 
   - package-ecosystem: github-actions
