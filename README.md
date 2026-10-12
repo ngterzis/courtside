@@ -1,6 +1,7 @@
 # Courtside
 
-[![CI](https://github.com/ngterzis/courtside/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ngterzis/courtside/actions/workflows/ci.yml)
+[![CI](https://github.com/ngterzis/courtside/actions/workflows/ci.yml/badge.svg)](https://github.com/ngterzis/courtside/actions/workflows/ci.yml)
+[![Deploy](https://github.com/ngterzis/courtside/actions/workflows/deploy.yml/badge.svg?branch=main)](https://github.com/ngterzis/courtside/actions/workflows/deploy.yml)
 
 Player-facing web app for a rec-league basketball league. Players sign in, check their
 stats, understand their AI-assigned **archetype** (Playmaker, Efficient Scorer, Glass
@@ -129,8 +130,9 @@ checked by eye.
 First-time E2E setup: `npx playwright install chromium`.
 
 **CI** (`.github/workflows/ci.yml`) runs lint, format check, typecheck, unit/component
-tests and E2E tests on every pull request and push to `main`. Deploys only run once CI
-passes.
+tests and E2E tests on every pull request. On `main` the same jobs run inside the deploy
+workflow, which calls CI and ships only if it passes — so a merge runs the suite once,
+not twice.
 
 ## How it works
 
