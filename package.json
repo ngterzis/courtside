@@ -75,5 +75,8 @@
     "workerDirectory": [
       "public"
     ]
+  },
+  "overrides": {
+    "msw": "$msw"
   }
 }
