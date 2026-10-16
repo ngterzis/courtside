@@ -1,11 +1,16 @@
 import { describe, expect, it } from 'vitest';
-import { readSSE } from './sse';
-import { SSE_DONE, sseEvent, streamFrom } from '@/test/streams';
+import { readSSE, type ChatStreamEvent } from './sse';
+import { SSE_DONE, sseEvent, sseFeedback, sseStatus, streamFrom } from '@/test/streams';
 
+async function events(stream: ReadableStream<Uint8Array>) {
+  const out: ChatStreamEvent[] = [];
+  for await (const event of readSSE(stream)) out.push(event);
+  return out;
+}
+
+// The text chunks only, which is what most tests care about.
 async function collect(stream: ReadableStream<Uint8Array>) {
-  const chunks: string[] = [];
-  for await (const chunk of readSSE(stream)) chunks.push(chunk);
-  return chunks;
+  return (await events(stream)).flatMap((e) => (e.type === 'text' ? [e.text] : []));
 }
 
 describe('readSSE', () => {
@@ -72,6 +77,27 @@ describe('readSSE', () => {
     ]);
 
     expect(await collect(stream)).toEqual(['ok']);
+  });
+
+  it('yields status and feedback events alongside text', async () => {
+    const stream = streamFrom([
+      sseFeedback('tok'),
+      sseStatus('Looking up your games…'),
+      sseEvent('31 points.'),
+      SSE_DONE,
+    ]);
+
+    expect(await events(stream)).toEqual([
+      { type: 'feedback', token: 'tok' },
+      { type: 'status', status: 'Looking up your games…' },
+      { type: 'text', text: '31 points.' },
+    ]);
+  });
+
+  it('ignores events with unknown fields', async () => {
+    const stream = streamFrom(['data: {"usage":{"tokens":5}}\n\n', sseEvent('ok'), SSE_DONE]);
+
+    expect(await events(stream)).toEqual([{ type: 'text', text: 'ok' }]);
   });
 
   it('releases the reader lock when finished', async () => {

@@ -1,6 +1,14 @@
 import { delay, http, HttpResponse } from 'msw';
 import { setupWorker } from 'msw/browser';
-import { mockChatReply, resolveMockRequest, SSE_DONE, sseEvent, toChunks } from './api';
+import {
+  mockChatReply,
+  resolveMockRequest,
+  SSE_DONE,
+  sseEvent,
+  sseFeedback,
+  sseStatus,
+  toChunks,
+} from './api';
 
 const encoder = new TextEncoder();
 
@@ -9,9 +17,13 @@ const handlers = [
     const { messages } = (await request.json()) as { messages: Array<{ content: string }> };
     const chunks = toChunks(mockChatReply(messages[messages.length - 1]?.content ?? ''));
 
-    // Stream word by word with a short pause, so the UI behaves like it does with the real model
+    // Mirror the real agent: a feedback token, a tool-lookup status, then the reply
+    // word by word with a short pause.
     const stream = new ReadableStream<Uint8Array>({
       async start(controller) {
+        controller.enqueue(encoder.encode(sseFeedback('mock-feedback-token')));
+        await delay(300);
+        controller.enqueue(encoder.encode(sseStatus('Looking up your games…')));
         await delay(600);
         for (const chunk of chunks) {
           controller.enqueue(encoder.encode(sseEvent(chunk)));
