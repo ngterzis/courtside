@@ -5,6 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useMe, useCurrentSeason } from '@/lib/queries';
 import { getToken } from '@/lib/auth';
+import { fetchWithResumeRetry } from '@/lib/dbResuming';
 import { readSSE } from '@/lib/sse';
 import { cn } from '@/lib/utils';
 
@@ -93,7 +94,7 @@ export default function ChatRoute() {
 
     try {
       const token = getToken();
-      const res = await fetch('/api/chat', {
+      const res = await fetchWithResumeRetry('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
