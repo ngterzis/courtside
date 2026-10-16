@@ -1,4 +1,5 @@
 import { clearToken, getToken } from './auth';
+import { fetchWithResumeRetry } from './dbResuming';
 
 export class ApiError extends Error {
   constructor(
@@ -13,7 +14,7 @@ export class ApiError extends Error {
 
 export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const token = getToken();
-  const res = await fetch(path, {
+  const res = await fetchWithResumeRetry(path, {
     ...init,
     headers: {
       'Content-Type': 'application/json',
