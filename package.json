@@ -29,11 +29,11 @@
     "screenshots": "playwright test --project=screenshots"
   },
   "dependencies": {
-    "@radix-ui/react-slot": "^1.4.0",
-    "@tanstack/react-query": "^5.104.1",
+    "@radix-ui/react-slot": "^1.5.0",
+    "@tanstack/react-query": "^5.104.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "lucide-react": "^1.55.0",
+    "lucide-react": "^1.57.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "react-markdown": "^10.1.0",
