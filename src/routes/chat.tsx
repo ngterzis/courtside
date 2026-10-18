@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Send } from 'lucide-react';
+import { ArrowLeft, Send, ThumbsDown, ThumbsUp } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useMe, useCurrentSeason } from '@/lib/queries';
+import { apiFetch } from '@/lib/api';
 import { getToken } from '@/lib/auth';
 import { fetchWithResumeRetry } from '@/lib/dbResuming';
 import { readSSE } from '@/lib/sse';
@@ -15,7 +16,14 @@ interface ChatMessage {
   id: string;
   role: 'user' | 'assistant';
   content: string;
+  /** What the agent is looking up right now (cleared when text resumes). */
+  status?: string;
+  /** Lets the player rate this answer; only set once the reply has finished. */
+  feedbackToken?: string;
+  rating?: Rating;
 }
+
+type Rating = 1 | -1;
 
 // ── Suggested questions ───────────────────────────────────────────────────────
 
@@ -37,7 +45,7 @@ const SUGGESTED: Array<{ group: string; questions: string[] }> = [
 
 // ── Thinking dots ─────────────────────────────────────────────────────────────
 
-function ThinkingDots() {
+function ThinkingDots({ label }: { label?: string }) {
   return (
     <div role="status" aria-label="Thinking" className="flex items-center gap-1 px-1 py-0.5">
       {[0, 150, 300].map((delay) => (
@@ -46,6 +54,42 @@ function ThinkingDots() {
           className="inline-block h-2 w-2 rounded-full bg-ink/30"
           style={{ animation: `bounce 1s ${delay}ms infinite` }}
         />
+      ))}
+      {label && <span className="ml-1.5 text-[12px] text-ink-50">{label}</span>}
+    </div>
+  );
+}
+
+// ── Answer rating ─────────────────────────────────────────────────────────────
+
+function FeedbackButtons({
+  rating,
+  onRate,
+}: {
+  rating?: Rating;
+  onRate: (rating: Rating) => void;
+}) {
+  const options = [
+    { value: 1 as const, label: 'Good answer', Icon: ThumbsUp },
+    { value: -1 as const, label: 'Bad answer', Icon: ThumbsDown },
+  ];
+  return (
+    <div className="mt-1 flex gap-1 pl-1">
+      {options.map(({ value, label, Icon }) => (
+        <button
+          key={value}
+          aria-label={label}
+          aria-pressed={rating === value}
+          disabled={rating !== undefined}
+          onClick={() => onRate(value)}
+          className={cn(
+            'inline-flex h-7 w-7 items-center justify-center rounded-full text-ink-50 transition-colors',
+            rating === value ? 'bg-paper-deep text-ink' : 'hover:bg-paper-deep',
+            rating !== undefined && rating !== value && 'opacity-30',
+          )}
+        >
+          <Icon className="h-3.5 w-3.5" />
+        </button>
       ))}
     </div>
   );
@@ -70,6 +114,23 @@ export default function ChatRoute() {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  function updateMessage(id: string, patch: (m: ChatMessage) => Partial<ChatMessage>) {
+    setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, ...patch(m) } : m)));
+  }
+
+  async function rate(msg: ChatMessage, rating: Rating) {
+    if (!msg.feedbackToken || msg.rating !== undefined) return;
+    updateMessage(msg.id, () => ({ rating }));
+    try {
+      await apiFetch('/api/chat/feedback', {
+        method: 'POST',
+        body: JSON.stringify({ token: msg.feedbackToken, score: rating }),
+      });
+    } catch {
+      updateMessage(msg.id, () => ({ rating: undefined })); // let them try again
+    }
+  }
 
   // Auto-resize textarea
   useEffect(() => {
@@ -108,22 +169,28 @@ export default function ChatRoute() {
       if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
 
       let received = false;
-      for await (const chunk of readSSE(res.body)) {
-        received = true;
-        setMessages((prev) =>
-          prev.map((m) => (m.id === assistantId ? { ...m, content: m.content + chunk } : m)),
-        );
+      let feedbackToken: string | undefined;
+      for await (const event of readSSE(res.body)) {
+        if (event.type === 'text') {
+          received = true;
+          updateMessage(assistantId, (m) => ({
+            content: m.content + event.text,
+            status: undefined,
+          }));
+        } else if (event.type === 'status') {
+          updateMessage(assistantId, () => ({ status: event.status }));
+        } else {
+          feedbackToken = event.token;
+        }
       }
       // An empty reply would leave the thinking dots up forever
       if (!received) throw new Error('Empty response');
+      updateMessage(assistantId, () => ({ status: undefined, feedbackToken }));
     } catch {
-      setMessages((prev) =>
-        prev.map((m) =>
-          m.id === assistantId
-            ? { ...m, content: 'Sorry, something went wrong. Please try again.' }
-            : m,
-        ),
-      );
+      updateMessage(assistantId, () => ({
+        content: 'Sorry, something went wrong. Please try again.',
+        status: undefined,
+      }));
     } finally {
       setStreaming(false);
     }
@@ -198,7 +265,7 @@ export default function ChatRoute() {
             messages.map((msg) => (
               <div
                 key={msg.id}
-                className={cn('flex', msg.role === 'user' ? 'justify-end' : 'justify-start')}
+                className={cn('flex flex-col', msg.role === 'user' ? 'items-end' : 'items-start')}
               >
                 <div
                   className={cn(
@@ -209,7 +276,7 @@ export default function ChatRoute() {
                   )}
                 >
                   {msg.role === 'assistant' && msg.content === '' ? (
-                    <ThinkingDots />
+                    <ThinkingDots label={msg.status} />
                   ) : msg.role === 'assistant' ? (
                     <ReactMarkdown
                       remarkPlugins={[remarkGfm]}
@@ -245,7 +312,13 @@ export default function ChatRoute() {
                   ) : (
                     msg.content
                   )}
+                  {msg.role === 'assistant' && msg.content !== '' && msg.status && (
+                    <ThinkingDots label={msg.status} />
+                  )}
                 </div>
+                {msg.role === 'assistant' && msg.feedbackToken && (
+                  <FeedbackButtons rating={msg.rating} onRate={(r) => rate(msg, r)} />
+                )}
               </div>
             ))
           )}

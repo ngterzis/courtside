@@ -1,4 +1,4 @@
-export { SSE_DONE, sseEvent } from '@/mocks/api';
+export { SSE_DONE, sseEvent, sseFeedback, sseStatus } from '@/mocks/api';
 
 const encoder = new TextEncoder();
 

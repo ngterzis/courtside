@@ -1,6 +1,14 @@
-// Reads the `/api/chat` SSE stream and yields each text chunk.
-// Wire format (see docs/BACKEND.md → Chat): `data: {"text":"..."}\n\n`, ending with `data: [DONE]\n\n`.
-export async function* readSSE(body: ReadableStream<Uint8Array>): AsyncGenerator<string> {
+// Reads the `/api/chat` SSE stream and yields one typed event per `data:` line.
+// Wire format (see docs/BACKEND.md → Chat): `data: {"text":"..."}\n\n`,
+// `data: {"status":"..."}\n\n` while the agent queries the database,
+// `data: {"feedback":"<token>"}\n\n` to rate the answer, ending with `data: [DONE]\n\n`.
+// Unknown fields are ignored so the server can add event kinds safely.
+export type ChatStreamEvent =
+  | { type: 'text'; text: string }
+  | { type: 'status'; status: string }
+  | { type: 'feedback'; token: string };
+
+export async function* readSSE(body: ReadableStream<Uint8Array>): AsyncGenerator<ChatStreamEvent> {
   const reader = body.getReader();
   const decoder = new TextDecoder();
   let buffer = '';
@@ -17,11 +25,18 @@ export async function* readSSE(body: ReadableStream<Uint8Array>): AsyncGenerator
           if (!line.startsWith('data: ')) continue;
           const data = line.slice(6).trim();
           if (data === '[DONE]') return;
+          let parsed: { text?: unknown; status?: unknown; feedback?: unknown };
           try {
-            const parsed = JSON.parse(data) as { text?: string };
-            if (parsed.text) yield parsed.text;
+            parsed = JSON.parse(data);
           } catch {
-            // ignore malformed events
+            continue; // ignore malformed events
+          }
+          if (typeof parsed.text === 'string' && parsed.text) {
+            yield { type: 'text', text: parsed.text };
+          } else if (typeof parsed.status === 'string' && parsed.status) {
+            yield { type: 'status', status: parsed.status };
+          } else if (typeof parsed.feedback === 'string' && parsed.feedback) {
+            yield { type: 'feedback', token: parsed.feedback };
           }
         }
       }

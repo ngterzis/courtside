@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import ChatRoute from './chat';
 import { setToken } from '@/lib/auth';
 import { MOCK_CURRENT_SEASON, MOCK_PLAYER } from '@/mocks/fixtures';
-import { SSE_DONE, sseEvent, streamFrom } from '@/test/streams';
+import { SSE_DONE, sseEvent, sseFeedback, sseStatus, streamFrom } from '@/test/streams';
 
 const encoder = new TextEncoder();
 
@@ -28,14 +28,17 @@ function controllableStream() {
 const json = (body: unknown) => new Response(JSON.stringify(body), { status: 200 });
 
 let chatResponse: () => Response | Promise<Response>;
+let feedbackResponse: () => Response;
 let fetchMock: ReturnType<typeof vi.fn>;
 
 beforeEach(() => {
   chatResponse = () => new Response(streamFrom([SSE_DONE]));
+  feedbackResponse = () => json({});
   fetchMock = vi.fn((url: string) => {
     if (url === '/api/me') return Promise.resolve(json(MOCK_PLAYER));
     if (url === '/api/seasons/current') return Promise.resolve(json(MOCK_CURRENT_SEASON));
     if (url === '/api/chat') return Promise.resolve(chatResponse());
+    if (url === '/api/chat/feedback') return Promise.resolve(feedbackResponse());
     return Promise.reject(new Error(`Unexpected fetch: ${url}`));
   });
   vi.stubGlobal('fetch', fetchMock);
@@ -56,6 +59,7 @@ function renderChat() {
 const input = () => screen.getByPlaceholderText('Ask about your stats…');
 const sendButton = () => screen.getByRole('button', { name: 'Send' });
 const chatRequests = () => fetchMock.mock.calls.filter(([url]) => url === '/api/chat');
+const feedbackRequests = () => fetchMock.mock.calls.filter(([url]) => url === '/api/chat/feedback');
 
 describe('ChatRoute', () => {
   it('greets the player by first name and offers suggested questions', async () => {
@@ -161,6 +165,79 @@ describe('ChatRoute', () => {
     expect(
       await screen.findByText('Sorry, something went wrong. Please try again.'),
     ).toBeInTheDocument();
+  });
+
+  it('shows what the agent is looking up until the answer starts', async () => {
+    const body = controllableStream();
+    chatResponse = () => new Response(body.stream);
+    const { user } = renderChat();
+
+    await user.type(input(), 'Best game?{Enter}');
+    body.push(sseStatus('Looking up your games…'));
+    expect(await screen.findByText('Looking up your games…')).toBeInTheDocument();
+
+    body.push(sseEvent('31 points vs the Bulls.'));
+    await screen.findByText('31 points vs the Bulls.');
+    expect(screen.queryByText('Looking up your games…')).not.toBeInTheDocument();
+
+    // A second lookup mid-answer shows under the text so far
+    body.push(sseStatus('Opening the box score…'));
+    expect(await screen.findByText('Opening the box score…')).toBeInTheDocument();
+
+    body.push(SSE_DONE);
+    body.close();
+    await waitFor(() => expect(input()).toBeEnabled());
+    expect(screen.queryByText('Opening the box score…')).not.toBeInTheDocument();
+  });
+
+  it('lets the player rate a finished answer once', async () => {
+    const body = controllableStream();
+    chatResponse = () => new Response(body.stream);
+    const { user } = renderChat();
+
+    await user.type(input(), 'Best game?{Enter}');
+    body.push(sseFeedback('fb_tok'));
+    body.push(sseEvent('31 points.'));
+    await screen.findByText('31 points.');
+    // No rating while the answer is still streaming
+    expect(screen.queryByRole('button', { name: 'Good answer' })).not.toBeInTheDocument();
+
+    body.push(SSE_DONE);
+    body.close();
+    await user.click(await screen.findByRole('button', { name: 'Bad answer' }));
+
+    await waitFor(() => expect(feedbackRequests()).toHaveLength(1));
+    expect(JSON.parse(feedbackRequests()[0][1].body)).toEqual({ token: 'fb_tok', score: -1 });
+    expect(screen.getByRole('button', { name: 'Bad answer' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(screen.getByRole('button', { name: 'Good answer' })).toBeDisabled();
+  });
+
+  it('allows rating again if sending the rating fails', async () => {
+    chatResponse = () => new Response(streamFrom([sseFeedback('t'), sseEvent('Hi.'), SSE_DONE]));
+    feedbackResponse = () => new Response('{}', { status: 500 });
+    const { user } = renderChat();
+
+    await user.type(input(), 'hi{Enter}');
+    await user.click(await screen.findByRole('button', { name: 'Good answer' }));
+
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Good answer' })).toBeEnabled());
+    expect(screen.getByRole('button', { name: 'Good answer' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+  });
+
+  it('shows no rating buttons when the server sends no feedback token', async () => {
+    chatResponse = () => new Response(streamFrom([sseEvent('Hi.'), SSE_DONE]));
+    const { user } = renderChat();
+
+    await user.type(input(), 'hi{Enter}');
+    await screen.findByText('Hi.');
+    await waitFor(() => expect(input()).toBeEnabled());
+    expect(screen.queryByRole('button', { name: 'Good answer' })).not.toBeInTheDocument();
   });
 
   it('ignores blank messages and shift+enter', async () => {

@@ -50,6 +50,8 @@ export function resolveMockRequest(method: string, pathname: string): MockRespon
       return ok(lastGame);
     case 'GET /api/me/notifications':
       return ok(MOCK_NOTIFICATIONS);
+    case 'POST /api/chat/feedback':
+      return ok({});
   }
 
   const game = pathname.match(/^\/api\/games\/([^/]+)$/);
@@ -105,4 +107,6 @@ export function toChunks(reply: string): string[] {
 }
 
 export const sseEvent = (text: string) => `data: ${JSON.stringify({ text })}\n\n`;
+export const sseStatus = (status: string) => `data: ${JSON.stringify({ status })}\n\n`;
+export const sseFeedback = (feedback: string) => `data: ${JSON.stringify({ feedback })}\n\n`;
 export const SSE_DONE = 'data: [DONE]\n\n';
