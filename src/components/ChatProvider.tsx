@@ -5,6 +5,11 @@ import { ChatContext, type ChatMessage, type Rating } from '@/lib/chat';
 import { fetchWithResumeRetry } from '@/lib/dbResuming';
 import { readSSE } from '@/lib/sse';
 
+// Not crypto.randomUUID(): browsers only expose it on HTTPS or localhost, so it throws when
+// the dev server is opened from a phone over the LAN
+let nextId = 0;
+const newId = () => `msg-${nextId++}`;
+
 // Holds the chat conversation above the routes, so leaving the chat tab doesn't lose it and a
 // reply that's still streaming keeps filling in while the player is elsewhere.
 export function ChatProvider({ children }: { children: ReactNode }) {
@@ -32,11 +37,11 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     const trimmed = content.trim();
     if (!trimmed || streaming) return;
 
-    const userMsg: ChatMessage = { id: crypto.randomUUID(), role: 'user', content: trimmed };
+    const userMsg: ChatMessage = { id: newId(), role: 'user', content: trimmed };
     const nextMessages = [...messages, userMsg];
     setMessages(nextMessages);
 
-    const assistantId = crypto.randomUUID();
+    const assistantId = newId();
     setMessages((prev) => [...prev, { id: assistantId, role: 'assistant', content: '' }]);
     setStreaming(true);
 
