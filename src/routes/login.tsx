@@ -43,7 +43,7 @@ export default function LoginRoute() {
       )}
       <form className="space-y-3" onSubmit={handleSubmit}>
         <input
-          className="w-full rounded-md border border-ink/15 bg-paper px-3 py-2 text-sm"
+          className="w-full rounded-md border border-ink/15 bg-paper px-3 py-2 text-base lg:text-sm"
           placeholder="Email"
           type="email"
           value={email}
@@ -51,7 +51,7 @@ export default function LoginRoute() {
           required
         />
         <input
-          className="w-full rounded-md border border-ink/15 bg-paper px-3 py-2 text-sm"
+          className="w-full rounded-md border border-ink/15 bg-paper px-3 py-2 text-base lg:text-sm"
           placeholder="Password"
           type="password"
           value={password}

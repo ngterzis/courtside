@@ -52,7 +52,7 @@ export default function OnboardingRoute() {
             Jersey number
           </label>
           <input
-            className="w-full rounded-md border border-ink/15 bg-paper px-3 py-2 text-sm"
+            className="w-full rounded-md border border-ink/15 bg-paper px-3 py-2 text-base lg:text-sm"
             type="number"
             min={0}
             max={99}

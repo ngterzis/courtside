@@ -162,7 +162,7 @@ export default function ArchetypeRoute() {
                 <span className="font-bold">{line.value}</span>
                 <span className="ml-1 text-ink-50">({line.percentile}th pctl.)</span>
               </span>
-              <span className="ml-2 shrink-0 text-ink-70">{line.comment}</span>
+              <span className="ml-2 text-right text-ink-70">{line.comment}</span>
             </div>
           ))}
           <hr className="my-1.5 border-dashed border-ink/15" />

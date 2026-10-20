@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { Home, ClipboardList, TrendingUp, User } from 'lucide-react';
+import { Home, ClipboardList, TrendingUp, User, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const tabs = [
@@ -7,12 +7,13 @@ const tabs = [
   { to: '/games', label: 'Games', icon: ClipboardList, end: false },
   { to: '/trends', label: 'Trends', icon: TrendingUp, end: false },
   { to: '/archetype', label: 'Role', icon: User, end: false },
+  { to: '/settings', label: 'Settings', icon: Settings, end: false },
 ];
 
 export function BottomNav() {
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-ink/10 bg-paper/95 backdrop-blur lg:hidden pb-safe">
-      <ul className="grid grid-cols-4">
+      <ul className="grid grid-cols-5">
         {tabs.map(({ to, label, icon: Icon, end }) => (
           <li key={to}>
             <NavLink

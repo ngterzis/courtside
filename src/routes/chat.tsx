@@ -252,7 +252,7 @@ export default function ChatRoute() {
               placeholder="Ask about your stats…"
               rows={1}
               disabled={streaming}
-              className="flex-1 resize-none bg-transparent text-[13px] leading-relaxed text-ink placeholder:text-ink-50 focus:outline-none disabled:opacity-50"
+              className="flex-1 resize-none bg-transparent text-base leading-relaxed lg:text-[13px] text-ink placeholder:text-ink-50 focus:outline-none disabled:opacity-50"
               style={{ maxHeight: 120 }}
             />
           </div>
