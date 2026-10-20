@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import { AppLayout } from './components/layout/AppLayout';
 import { AuthLayout } from './components/layout/AuthLayout';
+import { ChatProvider } from './components/ChatProvider';
 import { DatabaseResumingDialog } from './components/DatabaseResumingDialog';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { PageLoader } from './components/PageLoader';
@@ -83,7 +84,14 @@ export default function App() {
 
             {/* Main app — also requires onboarding to be done */}
             <Route element={<RequireOnboarded />}>
-              <Route element={<AppLayout />}>
+              {/* Above the routes so the chat survives switching tabs */}
+              <Route
+                element={
+                  <ChatProvider>
+                    <AppLayout />
+                  </ChatProvider>
+                }
+              >
                 <Route index element={<DashboardRoute />} />
                 <Route path="/archetype" element={<ArchetypeRoute />} />
                 <Route path="/archetype/history" element={<ArchetypeHistoryRoute />} />

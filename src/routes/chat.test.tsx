@@ -1,9 +1,10 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MemoryRouter } from 'react-router-dom';
+import { Link, MemoryRouter, Outlet, Route, Routes } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import ChatRoute from './chat';
+import { ChatProvider } from '@/components/ChatProvider';
 import { setToken } from '@/lib/auth';
 import { MOCK_CURRENT_SEASON, MOCK_PLAYER } from '@/mocks/fixtures';
 import { SSE_DONE, sseEvent, sseFeedback, sseStatus, streamFrom } from '@/test/streams';
@@ -49,7 +50,22 @@ function renderChat() {
   render(
     <QueryClientProvider client={queryClient}>
       <MemoryRouter initialEntries={['/chat']}>
-        <ChatRoute />
+        <ChatProvider>
+          <Routes>
+            <Route
+              element={
+                <>
+                  <Link to="/chat">Chat tab</Link>
+                  <Link to="/games">Games tab</Link>
+                  <Outlet />
+                </>
+              }
+            >
+              <Route path="/chat" element={<ChatRoute />} />
+              <Route path="/games" element={<p>Games page</p>} />
+            </Route>
+          </Routes>
+        </ChatProvider>
       </MemoryRouter>
     </QueryClientProvider>,
   );
@@ -238,6 +254,40 @@ describe('ChatRoute', () => {
     await screen.findByText('Hi.');
     await waitFor(() => expect(input()).toBeEnabled());
     expect(screen.queryByRole('button', { name: 'Good answer' })).not.toBeInTheDocument();
+  });
+
+  it('keeps the conversation after switching to another tab and back', async () => {
+    chatResponse = () => new Response(streamFrom([sseEvent('Turnovers.'), SSE_DONE]));
+    const { user } = renderChat();
+
+    await user.type(input(), "What's my weakest area?{Enter}");
+    await screen.findByText('Turnovers.');
+
+    await user.click(screen.getByRole('link', { name: 'Games tab' }));
+    await screen.findByText('Games page');
+    await user.click(screen.getByRole('link', { name: 'Chat tab' }));
+
+    expect(await screen.findByText("What's my weakest area?")).toBeInTheDocument();
+    expect(screen.getByText('Turnovers.')).toBeInTheDocument();
+  });
+
+  it('keeps streaming the reply while the player is on another tab', async () => {
+    const body = controllableStream();
+    chatResponse = () => new Response(body.stream);
+    const { user } = renderChat();
+
+    await user.type(input(), 'Best game?{Enter}');
+    body.push(sseEvent('31 points '));
+    await screen.findByText('31 points');
+
+    await user.click(screen.getByRole('link', { name: 'Games tab' }));
+    body.push(sseEvent('vs the Bulls.'));
+    body.push(SSE_DONE);
+    body.close();
+    await user.click(screen.getByRole('link', { name: 'Chat tab' }));
+
+    expect(await screen.findByText('31 points vs the Bulls.')).toBeInTheDocument();
+    await waitFor(() => expect(input()).toBeEnabled());
   });
 
   it('ignores blank messages and shift+enter', async () => {

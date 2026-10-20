@@ -3,27 +3,9 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, Send, ThumbsDown, ThumbsUp } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { useChat, type Rating } from '@/lib/chat';
 import { useMe, useCurrentSeason } from '@/lib/queries';
-import { apiFetch } from '@/lib/api';
-import { getToken } from '@/lib/auth';
-import { fetchWithResumeRetry } from '@/lib/dbResuming';
-import { readSSE } from '@/lib/sse';
 import { cn } from '@/lib/utils';
-
-// ── Types ─────────────────────────────────────────────────────────────────────
-
-interface ChatMessage {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  /** What the agent is looking up right now (cleared when text resumes). */
-  status?: string;
-  /** Lets the player rate this answer; only set once the reply has finished. */
-  feedbackToken?: string;
-  rating?: Rating;
-}
-
-type Rating = 1 | -1;
 
 // ── Suggested questions ───────────────────────────────────────────────────────
 
@@ -101,9 +83,8 @@ export default function ChatRoute() {
   const { data: me } = useMe();
   const { data: season } = useCurrentSeason();
 
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const { messages, streaming, sendMessage: send, rate } = useChat();
   const [input, setInput] = useState('');
-  const [streaming, setStreaming] = useState(false);
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -115,23 +96,6 @@ export default function ChatRoute() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  function updateMessage(id: string, patch: (m: ChatMessage) => Partial<ChatMessage>) {
-    setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, ...patch(m) } : m)));
-  }
-
-  async function rate(msg: ChatMessage, rating: Rating) {
-    if (!msg.feedbackToken || msg.rating !== undefined) return;
-    updateMessage(msg.id, () => ({ rating }));
-    try {
-      await apiFetch('/api/chat/feedback', {
-        method: 'POST',
-        body: JSON.stringify({ token: msg.feedbackToken, score: rating }),
-      });
-    } catch {
-      updateMessage(msg.id, () => ({ rating: undefined })); // let them try again
-    }
-  }
-
   // Auto-resize textarea
   useEffect(() => {
     const el = textareaRef.current;
@@ -140,60 +104,10 @@ export default function ChatRoute() {
     el.style.height = `${Math.min(el.scrollHeight, 120)}px`;
   }, [input]);
 
-  async function sendMessage(content: string) {
-    const trimmed = content.trim();
-    if (!trimmed || streaming) return;
-
-    const userMsg: ChatMessage = { id: crypto.randomUUID(), role: 'user', content: trimmed };
-    const nextMessages = [...messages, userMsg];
-    setMessages(nextMessages);
+  function sendMessage(content: string) {
+    if (!content.trim() || streaming) return;
     setInput('');
-
-    const assistantId = crypto.randomUUID();
-    setMessages((prev) => [...prev, { id: assistantId, role: 'assistant', content: '' }]);
-    setStreaming(true);
-
-    try {
-      const token = getToken();
-      const res = await fetchWithResumeRetry('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({
-          messages: nextMessages.map(({ role, content }) => ({ role, content })),
-        }),
-      });
-
-      if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
-
-      let received = false;
-      let feedbackToken: string | undefined;
-      for await (const event of readSSE(res.body)) {
-        if (event.type === 'text') {
-          received = true;
-          updateMessage(assistantId, (m) => ({
-            content: m.content + event.text,
-            status: undefined,
-          }));
-        } else if (event.type === 'status') {
-          updateMessage(assistantId, () => ({ status: event.status }));
-        } else {
-          feedbackToken = event.token;
-        }
-      }
-      // An empty reply would leave the thinking dots up forever
-      if (!received) throw new Error('Empty response');
-      updateMessage(assistantId, () => ({ status: undefined, feedbackToken }));
-    } catch {
-      updateMessage(assistantId, () => ({
-        content: 'Sorry, something went wrong. Please try again.',
-        status: undefined,
-      }));
-    } finally {
-      setStreaming(false);
-    }
+    send(content);
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
