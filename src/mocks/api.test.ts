@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { mockChatReply, resolveMockRequest, toChunks } from './api';
 import { MOCK_GAMES } from './fixtures';
+import type { Game } from '@/types';
 
 describe('mock API', () => {
   // Every endpoint the app calls must be mocked, or `npm run dev:mock` shows a broken page
@@ -26,6 +27,14 @@ describe('mock API', () => {
   it('returns 404 for unknown games and endpoints', () => {
     expect(resolveMockRequest('GET', '/api/games/nope').status).toBe(404);
     expect(resolveMockRequest('DELETE', '/api/me').status).toBe(404);
+  });
+
+  it('returns games newest first, like the real API', () => {
+    const { games } = resolveMockRequest('GET', '/api/me/games').body as { games: Game[] };
+    const dates = games.map((g) => g.date);
+
+    expect(dates).toEqual([...dates].sort().reverse());
+    expect(resolveMockRequest('GET', '/api/me/games/last').body).toBe(games[0]);
   });
 
   it('picks a chat reply by topic and splits it into chunks that rebuild it exactly', () => {

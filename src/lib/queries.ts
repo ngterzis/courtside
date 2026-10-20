@@ -55,7 +55,8 @@ export const useGames = (seasonId?: string) =>
       const data = await apiFetch<{ games: Game[]; total: number }>(
         `/api/me/games${seasonId ? `?seasonId=${seasonId}` : ''}`,
       );
-      return data.games;
+      // The API sends newest first; charts and the "Last 5" range need oldest first
+      return [...data.games].sort((a, b) => a.date.localeCompare(b.date));
     },
   });
 
