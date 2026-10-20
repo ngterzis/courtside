@@ -247,8 +247,9 @@ sync `dist/` to S3 and invalidate CloudFront (AWS auth via OIDC). Requires the
 
 Every pull request gets a Vercel preview, linked from a bot comment on the PR. Previews are
 built with `npm run build:mock`, so they run on the mock API with no backend, secrets or
-login, and chat replies are pre-written. `vercel.json` disables Vercel deploys of `main`,
-which only ships to AWS, and rewrites every route to `index.html` for client-side routing.
+login, and chat replies are pre-written. All Vercel settings live in `vercel.json`: the
+build commands, no Vercel deploys of `main` (which only ships to AWS), and a rewrite of
+every route to `index.html` for client-side routing.
 In a team setting, previews would point at a staging backend with seeded data instead.
 
 ## Related repos
