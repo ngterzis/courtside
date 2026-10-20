@@ -20,7 +20,9 @@ export interface MockResponse {
 const ok = (body: unknown): MockResponse => ({ status: 200, body });
 const notFound = (message: string): MockResponse => ({ status: 404, body: { message } });
 
-const lastGame = MOCK_GAMES[MOCK_GAMES.length - 1];
+// Newest first, as docs/BACKEND.md specifies
+const gamesNewestFirst = [...MOCK_GAMES].sort((a, b) => b.date.localeCompare(a.date));
+const lastGame = gamesNewestFirst[0];
 
 export function resolveMockRequest(method: string, pathname: string): MockResponse {
   const key = `${method} ${pathname}`;
@@ -45,7 +47,7 @@ export function resolveMockRequest(method: string, pathname: string): MockRespon
     case 'GET /api/me/team-ranks':
       return ok(MOCK_TEAM_RANKS);
     case 'GET /api/me/games':
-      return ok({ games: MOCK_GAMES, total: MOCK_GAMES.length });
+      return ok({ games: gamesNewestFirst, total: gamesNewestFirst.length });
     case 'GET /api/me/games/last':
       return ok(lastGame);
     case 'GET /api/me/notifications':
